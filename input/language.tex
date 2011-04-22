@@ -1,0 +1,20 @@
+%% language
+
+\newcommand{\langOF}[2]{#1/#2}
+\newcommand{\langPAGE}{p.}
+
+\ifthenelse{\equal{\doclanguage}{english}}{
+	%% English
+	\usepackage[english]{babel}
+	\renewcommand{\langOF}[2]{#1 of #2}
+	\renewcommand{\langPAGE}{page}
+}{
+\ifthenelse{\equal{\doclanguage}{french}}{
+	%% French
+	\usepackage[francais]{babel}
+	\NoAutoSpaceBeforeFDP
+	\renewcommand{\langOF}[2]{#1 sur #2}
+	\renewcommand{\langPAGE}{page}
+}{
+	%% Other languages
+}}

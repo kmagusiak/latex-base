@@ -1,0 +1,37 @@
+%% Presentation body
+
+% For the title page
+\author{\docauthor}
+\title{\doctitle}
+\subtitle{\docsubtitle}
+\subject{\docsubject}
+\date{\docdate}
+\institute{\docorganization}
+\ifthenelse{\equal{\doclogo}{}}{
+%\logo{default-logo}
+}{
+\logo{\includeimagebase[keepaspectratio=true,
+	width=0.3\textwidth,height=0.3\textheight]{\doclogo}}
+}
+
+%% Bibliography
+\bibliography{biblio}
+
+%%%%%%%%%%%%
+% Document %
+%%%%%%%%%%%%
+\begin{document}
+
+\frame{\maketitle}
+
+\frame{
+	\setcounter{tocdepth}{2}
+	\tableofcontents
+	%\tableofcontents[currentsection,hideothersubsections]
+}
+
+\input{presentation-example}
+
+\frame{\printbibliography}
+
+\end{document}

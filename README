@@ -1,0 +1,91 @@
+==================
+latex-base package
+==================
+
+latex-base eases writing of LaTeX documents by providing a set of templates,
+examples and tools to build a PDF automatically.
+
+Most of the time, the use will use a copy of this project for another project
+containing a set of documents. Additional templates may later be added back to
+this project and updates of this project should not break the compatibility.
+
+Dependencies
+============
+
+- pdflatex
+- bibtex
+- makeindex
+- python (for dependency generation)
+
+Optional dependencies:
+- dia
+- graphviz
+- inkscape or imagemagick
+
+Description of documents and directories
+========================================
+
+LaTeX files and input directory
+-------------------------------
+- biblio.bib: BibTeX database
+- document.tex: a simple document
+	(it contains document-example.tex)
+- presentation.tex: a Beamer presentation
+	(contains the body, metadata and an example)
+- presentation-article.tex: presentation.tex rendered as an article
+
+The directory input contains files that are included by the documents to add
+macros, import a set of packages, define the theme, etc. A document should
+include a *-style.tex file in the prelude and if present a *-begin.tex just
+after the \begin{document} tag.
+
+Images
+------
+The directory img contains all images manipulated by the project. You can create
+sub-directories to classify your files. Also, files that are source of generated
+images should be in that directory.
+
+Scripts and generation
+----------------------
+There is a Makefile for building the project and auxiliary scripts in the script
+directory. The `Makefile.files` describes what LaTeX files are source of a
+generated document. Finally, the file `Makefile.d` that includes automatic
+dependencies can be generated; it should not be under revision control.
+
+Basic workflow
+==============
+
+Editing files
+-------------
+The user selects the type of documents they want to use and make a copy of these
+on the root of the project. Then, they register these files in `Makefile.files`.
+Optionally, they edit the input styles by making a copy of an existing style and
+changing it. Then, images should be added to `img`.
+Unnecessary files may be deleted.
+It is also good to adopt a naming strategy if more than one resulting file will
+be present in the project, such as a common prefix.
+
+Makefile
+--------
+Use `make` to compile the files automatically.
+When running, consider using -s option to mask the executed commands.
+For a list of targets, run:
+	make help
+
+If you want the output of LaTeX, run:
+	make VERBOSE=yes
+
+Useful links and tutorials
+==========================
+
+- LaTeX Wikibooks
+	http://en.wikibooks.org/wiki/LaTeX
+- Andy Robert's tutorial
+	http://www.andy-roberts.net/misc/latex/
+- List of LaTeX commands
+	http://www.emerson.emory.edu/services/latex/latex_toc.html
+- Beamer Guide
+	http://www.scribd.com/doc/28011/beamer-guide
+- The Comprehensive LaTeX Symbol list
+	http://www.ctan.org/tex-archive/info/symbols/comprehensive/symbols-a4.pdf
+- The Not So Short Introduction to LATEX2e

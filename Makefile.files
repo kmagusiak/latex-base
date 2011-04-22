@@ -1,0 +1,19 @@
+############################
+## Makefile (LaTeX) files ##
+############################
+
+PROJECT_NAME=latex-base
+EXPORT_DIR=$(PROJECT_NAME)
+
+## Document list (tex files)
+DOC=document.tex \
+	letter.tex \
+	presentation.tex \
+	presentation-article.tex
+
+## Dependencies
+#document.pdf: document.tex input-listings.tex
+
+## Dependencies (automatically built)
+DOC_AUTODEP=$(DOC)
+

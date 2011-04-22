@@ -1,0 +1,90 @@
+%% listings
+
+%% Packages
+\usepackage{xcolor} % Colors
+\usepackage{listings} % Listings
+\usepackage{courier} % Permit bold typewriter
+
+%% Algorithms
+\usepackage{algorithm}
+\usepackage{algorithmicx,algpseudocode}
+
+%% Default style
+\lstset{basicstyle=\ttfamily\small
+	,tabsize=4
+%	,frame=single
+%	,numbers=left
+	,numberstyle=\tiny
+	,numbersep=5pt
+	,numberfirstline=true
+	,firstnumber=1
+	,stepnumber=5
+	,showspaces=false
+	,showstringspaces=false
+	,showtabs=false
+	,breaklines=false
+	,breakatwhitespace=true
+}
+
+%% Default colors
+\definecolor{listingsComment}{rgb}{0.3,0.3,0.3}
+\definecolor{listingsIdentifier}{rgb}{0,0,0}
+\definecolor{listingsKeyword}{rgb}{0,0,0}
+\definecolor{listingsString}{rgb}{0.6,0,0}
+
+%% Default
+\lstdefinestyle{defaultColors}{
+	commentstyle=\color{listingsComment}\itshape
+	,identifierstyle=\color{listingsIdentifier}
+	,keywordstyle=\color{listingsKeyword}\bfseries
+	,stringstyle=\color{listingsString}
+}
+
+%% C, C++
+\lstdefinestyle{c}{style=defaultColors
+	,language=c
+}
+\lstdefinestyle{cpp}{style=c
+	,language=c++
+}
+
+%% IDL
+\definecolor{colCorbaKeyword}{rgb}{0,0,0.25}
+\lstdefinestyle{corba}{style=defaultColors
+	,language=[CORBA]IDL
+	,keywordstyle=\color{colCorbaKeyword}\bfseries
+}
+
+%% Java
+\definecolor{colJavaKeyword}{rgb}{0.5,0,0.2}
+\lstdefinestyle{java}{style=defaultColors
+	,language=java
+	,keywordstyle=\color{colJavaKeyword}\bfseries
+}
+
+%% Python
+\definecolor{colPythonKeyword}{rgb}{0.9,0.4,0}
+\lstdefinestyle{python}{style=defaultColors
+	,language=python
+	,keywordstyle=\color{colPythonKeyword}\bfseries
+}
+
+%% Shell, bash
+\lstdefinestyle{sh}{style=defaultColors
+	,language=sh
+}
+\lstdefinestyle{bash}{style=sh
+	,language=bash
+}
+
+%% XML
+\definecolor{colXMLIdentifier}{rgb}{0,0,0.6}
+\lstdefinestyle{xml}{style=defaultColors
+	%,language=XML
+	,morestring=[s]{>}{<}
+	,morestring=[b]"
+	,morecomment=[s]{!--}{--}
+	,morecomment=[s]{<?}{?>}
+	,identifierstyle=\color{colXMLIdentifier}
+	,stringstyle=\color{black}
+}

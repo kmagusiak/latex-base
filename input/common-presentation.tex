@@ -1,0 +1,22 @@
+%% common-presentation
+
+\input{input/common}
+
+%% Packages
+\usepackage{tabularx} % Tables (extended)
+\usepackage{grffile} % File names fix (graphicsx '.' in names)
+
+%% Listings
+\input{input/listings}
+
+%% TikZ (drawing)
+\input{input/tikz}
+
+%% Bibliography
+\usepackage[natbib=false
+	%,sorting=none
+	]{biblatex}
+
+%% Styles and commands
+\input{input/macros}
+\renewcommand{\pcomment}[1]{\begin{scriptsize}(#1)\end{scriptsize}}

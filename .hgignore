@@ -1,0 +1,32 @@
+# latex-base: ignored files
+syntax: glob
+
+# Generated files
+Makefile.d
+*.pdf
+
+# Temporary LaTeX files
+*.aux
+*.bbl
+*.blg
+*.fax
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.loh
+*.loi
+*.lot
+*.nav
+*.out
+*.snm
+*.tns
+*.toc
+*.vrb
+*.run.xml
+*-blx.bib

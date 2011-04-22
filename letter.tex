@@ -1,0 +1,43 @@
+\documentclass[a4paper
+	,11pt
+	]{letter}
+\usepackage[utf8]{inputenc}
+%% see: http://en.wikibooks.org/wiki/LaTeX/Letters
+
+%% Meta-information
+\def\doclanguage{english}
+\def\docauthor{[AUTHOR]}
+\def\doctitle{Letter}
+\def\docdate{\today}
+
+%% Letter information
+\name{\docauthor}
+\signature{\docauthor}
+\address{[RETURN-ADDRESS]}
+
+%% Style
+\input{input/letter-style}
+
+%%%%%%%%%%
+% Letter %
+%%%%%%%%%%
+
+\begin{document}
+\pagestyle{plain}
+\begin{letter}{%
+	[RECIPIENT]
+}
+
+\opening{Dear ...,}
+
+The content of the letter starts here...
+This is just another \LaTeX{} document to write, nothing special here.
+
+I look forward to your reply.
+
+\closing{Yours faithfuly,}
+\ps{PS: post scriptum}
+\encl{enclosed document}
+
+\end{letter}
+\end{document}

@@ -1,0 +1,34 @@
+%% common
+
+%% Packages for commands
+\usepackage{ifthen} % ITE commands
+\usepackage{keyval} % Key-Value package
+\usepackage{optparams} % Optional parameters
+
+%% Encoding and symbols
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts, amsmath, amssymb, amsthm}
+\usepackage{eurosym}
+\input{input/language}
+
+% Typeout
+\typeout{}
+\typeout{** DOCUMENT METADATA}
+\typeout{Language: \doclanguage}
+\typeout{Title: \doctitle}
+\typeout{Author: \docauthor}
+\typeout{Date: \docdate}
+\ifthenelse{\isundefined{\docorganization}}{
+\def\docorganization{}
+}{
+\typeout{Organization: \docorganization}
+}
+\ifthenelse{\isundefined{\docsubject}}{
+\def\docsubject{}
+}{
+\typeout{Subject: \docsubject}
+}
+\ifthenelse{\isundefined{\dockeywords}}{
+\def\dockeywords{}
+}{}
+\typeout{}

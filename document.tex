@@ -1,0 +1,70 @@
+\documentclass[a4paper
+	,11pt
+	%,landscape
+	%,openright
+	%,twocolumn
+	%,twoside
+	]{article}
+	%]{report}
+\usepackage[utf8]{inputenc}
+
+%% Meta-information
+\def\doclanguage{}
+\def\docauthor{[AUTHOR]}
+\def\doctitle{[TITLE]}
+\def\docdate{\today}
+\def\docsubject{}
+\def\dockeywords{}
+\def\doctitlepagename{}
+\def\docorganization{}
+\def\doclogo{}
+% For the title page
+\author{\docauthor}
+\title{\doctitle}
+\date{\docdate}
+\def\docabstract{}
+
+%% Style
+\input{input/document-style}
+\setcounter{tocdepth}{2}
+
+%% Bilbiography and indexes
+\bibliography{biblio}
+\makeindex
+
+%%%%%%%%%%%%
+% Document %
+%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%
+% Title section %
+%%%%%%%%%%%%%%%%%
+\input{input/document-begin}
+
+%%%%%%%%%%%%%
+% Body text %
+%%%%%%%%%%%%%
+
+\input{document-example}
+
+%%%%%%%%%%
+% Ending %
+%%%%%%%%%%
+%\clearpage
+
+%% Bibliography, indexes and lists
+%\listoffigures
+%\listoftables
+%\nocite{*} % include all citations
+\printbibliography
+\printindex
+
+%%%%%%%%%%%%
+% Appendix %
+%%%%%%%%%%%%
+\appendix
+
+%\input{appendix}
+
+\end{document}

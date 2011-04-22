@@ -1,0 +1,32 @@
+%% document-begin
+%% (title page and toc)
+
+\ifthenelse{\equal{\doctitlepagename}{}}{
+\maketitle
+}{
+\input{input/title/title_\doctitlepagename}
+}
+
+\ifthenelse{\equal{\docabstract}{}}{}{
+\begin{abstract}
+\docabstract
+\end{abstract}
+}
+%\vspace*{\fill}
+%\clearpage
+
+%% Headers and footers
+\lhead{}
+\chead{}
+\rhead{\bfseries \doctitle}
+\lfoot{\docauthor}
+\cfoot{}
+\rfoot{\langOF{\thepage{}}{\pageref{LastPage}}}
+
+%% TOC
+\tableofcontents
+\ifthenelse{\equal{\doctitlepagename}{}}{
+\vspace*{\fill}
+}{
+\clearpage
+}
