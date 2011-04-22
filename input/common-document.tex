@@ -1,0 +1,33 @@
+%% common-document
+
+\input{input/common}
+
+%% Packages
+\usepackage[pdftex]{hyperref}
+\usepackage[pdftex]{graphicx} % Include graphics
+\usepackage{grffile} % File names fix (graphicsx '.' in names)
+\usepackage{tabularx} % Tables (extended)
+\usepackage{float} % Floats (extended)
+\usepackage[table]{xcolor} % Colors
+
+\usepackage{fancyhdr} % Headers and footers
+\usepackage{lastpage} % \pageref{LastPage} % Must be compiled 2 times!
+\usepackage{acronym} % For acronyms
+\usepackage{makeidx} % Index
+\usepackage{setspace} % Changing the interline
+\usepackage{multirow} % Row spanning in tables
+\usepackage{rotating} % Rotated text
+
+%% Code formatting
+\input{input/listings}
+
+%% TikZ (drawing)
+\input{input/tikz}
+
+%% Bibliography
+\usepackage[natbib=false
+	%,sorting=none
+	]{biblatex}
+
+%% Macros
+\input{input/macros}

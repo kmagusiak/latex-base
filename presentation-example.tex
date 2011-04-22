@@ -1,0 +1,170 @@
+%% Example of a presentation
+
+\section{Basic frames}
+
+\subsection{Elements}
+
+\frame{
+\frametitle{[TITLE]}
+\framesubtitle{[SUBTITLE]}
+\begin{columns}
+\column{0.5\textwidth}
+COLUMN 1
+\column{0.5\textwidth}
+COLUMN 2
+\end{columns}
+\begin{center}
+some text
+\note{This is a note, not visible by default in the presentation}
+\end{center}
+}
+
+\frame{
+	\frametitle{Blocks}
+	\begin{block}{[block]} ABC \end{block}
+	\begin{exampleblock}{[exampleblock]} ABC \end{exampleblock}
+	\begin{alertblock}{[alertblock]} ABC \end{alertblock}
+}
+
+\colorlet{structurebackup}{structure}
+\colorlet{structure}{magenta}
+\usestructuretemplate{\color{structure}}{}
+\beamertemplateshadingbackground{yellow!50}{white!50}
+\frame{
+	\frametitle{Highlighting and background colors}
+	Normal, \alert{alert}, \structure{structure}.
+}
+\colorlet{structure}{structurebackup}
+%\beamertemplatesolidbackgroundcolor{white}
+\beamertemplateshadingbackground{white}{white}
+
+\subsection{Options}
+
+\frame[plain,t]{
+	\frametitle{Plain frame}
+	\texttt{plain} frame removes header, footers, etc
+	to leave as much space as possible
+	
+	Also, contents of this frame are aligned to the top by giving an option
+	\texttt{t}.
+}
+
+\frame[allowframebreaks]{
+	\frametitle{With frame breaks}
+	\texttt{allowframebreaks} will split the contents of a frame across many
+	slides if it needs more space
+}
+\frame[shrink]{
+	\frametitle{Shrunk frame}
+	\texttt{shrink} option means that the contents will be shrunk if there is
+	not enough space on the frame
+	
+	\vspace{5cm}
+	some text;
+	here vertical space was added to force the shrinking
+	\vspace{5cm}
+}
+
+\subsection{Other}
+
+\frame{
+	\frametitle{References}
+	A simple reference to wikipedia \cite{wikipedia}.
+}
+
+\section{Floating elements}
+
+\subsection{Images}
+
+\frame{
+	\frametitle{Image}
+	\centering
+	\includeimage[width=0.5\linewidth,height=4cm]{logo}
+}
+
+\frame{
+	\frametitle{TikZ}
+	\begin{center}
+	\begin{tikzpicture}
+	\begin{axis}
+	\addplot+[sharp plot] coordinates
+	{(0,0) (1,2) (2,3)};
+	\end{axis}
+	\end{tikzpicture}
+	\end{center}
+}
+
+\subsection{Tables and minipages}
+
+\frame{
+	\frametitle{Tables and minipages}
+	\begin{columns}
+	\column{0.4\textwidth}
+	\begin{table}[H]
+	\centering
+	\rowcolors{1}{blue!20}{blue!5}
+	\begin{tabular}{|l|c|}
+	\hline
+	hello & world \\
+	abc & def \\
+	ghi & jkl \\
+	mno & pqr \\
+	\hline
+	\end{tabular}
+	\caption{Colored table}
+	\end{table}
+	\column{0.4\textwidth}
+	\fbox{\begin{minipage}{\linewidth}
+	This is a minipage.
+	\end{minipage}}
+	\end{columns}
+}
+
+\subsection{Listings}
+
+\defverbatim[colored]\listingCHelloWorld{%
+\begin{lstlisting}[style=c,title={C Hello World}]
+#include <stdio.h>
+
+int main(void) {
+	printf("hello world\n");
+	return 0;
+}
+\end{lstlisting}}
+\frame{
+	\frametitle{Listings}
+	\listingCHelloWorld
+}
+
+\section{Animations}
+
+\frame{
+	\frametitle{Pausing}
+	\texttt{\textbackslash{}pause} can be added nearly anywhere to stop drawing
+	at that point and continue later
+	\pause
+	
+	...that's nice
+}
+
+\frame{
+	\frametitle{Slide transition}
+	\texttt{
+		\only<1>{...........}
+		\only<2>{hello world}
+		\only<3>{other words}
+	}
+	\transwipe<1-2>[direction=0]
+	\transduration<1-2>{2}
+	\transdissolve<3>
+}
+
+\frame{
+	\frametitle{Some lists}
+	\begin{itemize}
+	\item<+-> point 1
+	\item<+-> point 2
+	\item<+-> point 3
+	\end{itemize}
+	\transdissolve
+}

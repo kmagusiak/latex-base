@@ -1,0 +1,45 @@
+%% Title page example from:
+%% http://en.wikibooks.org/wiki/LaTeX/Title_Creation
+
+\makeatletter
+\begin{titlepage}
+\begin{center}
+
+% Upper part of the page
+\ifthenelse{\equal{\doclogo}{}}{}{
+\includeimage[width=0.15\textwidth]{\doclogo}
+}    
+
+\textsc{\LARGE \docorganization}\\[1.5cm]
+\textsc{\Large Final year project}\\[0.5cm]
+
+\vfill
+
+% Title
+\rule{\linewidth}{0.5mm} \\[0.4cm]
+{\huge \bfseries \@title}\\[0.4cm]
+\rule{\linewidth}{0.5mm} \\[1.5cm]
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+\begin{tabular}{@{}c@{}} \@author \end{tabular}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+{[SUPERVISOR]}
+\end{flushright}
+\end{minipage}
+
+\vfill
+
+% Bottom of the page
+{\large \@date{}}
+
+\end{center}
+\end{titlepage}
+\makeatother
+
