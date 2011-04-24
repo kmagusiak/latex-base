@@ -16,15 +16,20 @@
 %\clearpage
 
 %% Headers and footers
-\lhead{}
+\lhead[\nouppercase{\leftmark}]{}
 \chead{}
-\rhead{\bfseries \doctitle}
-\lfoot{\docauthor}
+\rhead[]{\bfseries \doctitle}
+\lfoot[\ofname{\thepage{}}{\pageref{LastPage}}]{\docauthor}
 \cfoot{}
-\rfoot{\langOF{\thepage{}}{\pageref{LastPage}}}
+\rfoot[]{\ofname{\thepage{}}{\pageref{LastPage}}}
 
 %% TOC
+\ifthenelse{\equal{\doctocdepth}{}}{}{
+\setcounter{tocdepth}{\doctocdepth}
 \tableofcontents
+}
+
+%% Page jump
 \ifthenelse{\equal{\doctitlepagename}{}}{
 \vspace*{\fill}
 }{

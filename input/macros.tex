@@ -12,22 +12,22 @@
 \long\def\includeimagefigureM@[#1][#2][#3]#4#5{
 	\begin{figure}[#2]
 	\centering
-	\vspace{-1mm}
+	\vspace{-0.3em}
 	\includeimagebase[#1,keepaspectratio=true]{#4}
-	\vspace{-6mm}
+	\vspace{-1em}
 	\ifthenelse{\equal{#3}{}}{
 		\caption{#5}
 	}{
 		\caption[#3]{#5}
 	}
 	\label{img:#4}
-	\vspace{-2mm}
+	\vspace{-0.5em}
 	\end{figure}
 }
 \newcommand{\includeimagefigure}{\optparams{\includeimagefigureM@}{[scale=1.0][H][]}}
 
 %% References
-\newcommand{\shortref}[1]{\hyperref[#1]{\ref{#1} - \langPAGE \pageref{#1}}}
+\newcommand{\shortref}[1]{\hyperref[#1]{\ref{#1} - \MakeLowercase{\pagename} \pageref{#1}}}
 \newcommand{\textref}[2]{\hyperref[#1]{#2 [\shortref{#1}]}}
 
 %% Other
