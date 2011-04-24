@@ -15,6 +15,7 @@ Dependencies
 - pdflatex
 - bibtex
 - makeindex
+- GNU make
 - python (for dependency generation)
 
 Optional dependencies:

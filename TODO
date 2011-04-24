@@ -1,0 +1,9 @@
+latex-base TODO list (sorted by priority)
+=========================================
+
+* A script to update and create copies of the templates used in other projects
+is needed.
+	- something like diff3?
+* Add a beamer template.
+* Personaly, Makefiles suit me, but python script to compile documents might be
+more extensible.
