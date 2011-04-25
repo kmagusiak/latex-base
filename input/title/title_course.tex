@@ -1,0 +1,57 @@
+%% Basic title page for courses
+% Options:
+% \def\titlepageAuthors{authors...} where author is \titlepageAuthor[mail]{name}
+% \def\titlepageCourse{course}
+% \def\titlepageProfessors{comma separated list of professors}
+% \def\titlepageAssistants{comma separated list of assistant names}
+
+\newcommand{\titlepageAuthor}[2][]{%
+	\mbox{#2} & \scriptsize{\href{mailto:#1}{\texttt{#1}}} \\
+}
+\newcommand{\titlepageCommaMBox}[2]{\ifthenelse{\value{#1} < 2}{}{, }\mbox{#2}}
+
+\makeatletter
+\begin{titlepage}
+
+\begin{center}
+\begin{small}
+
+\textsc{\docorganization}
+\ifthenelse{\equal{\doclogo}{}}{}{
+\includeimage[width=\linewidth,height=4cm]{\doclogo}
+}
+
+\vspace*{\fill}
+{\LARGE \scshape \@title} \\[4mm]
+{\Large \scshape \begin{tabular}{c} \@author \end{tabular}} \\[3mm]
+{\normalsize \@date}
+{\@thanks}
+
+\vspace*{\fill}
+\ifthenelse{\isundefined{\titlepageAuthors}}{}{
+\begin{tabular}{rl}
+\titlepageAuthors
+\end{tabular}
+}
+
+\vspace*{\fill}
+\begin{tabular}{rp{6cm}}
+\ifthenelse{\isundefined{\titlepageCourse}}{}{
+\coursename: & \mbox{\titlepageCourse} \\
+}
+\ifthenelse{\isundefined{\titlepageProfessors}}{}{
+\professorname: & \MapListX{\titlepageCommaMBox}{\titlepageProfessors} \\
+}
+\ifthenelse{\isundefined{\titlepageAssistants}}{}{
+\assistantname: & \MapListX{\titlepageCommaMBox}{\titlepageAssistants} \\
+}
+\end{tabular}
+
+\end{small}
+\end{center}
+
+\vspace*{\fill}
+
+\end{titlepage}
+\makeatother
+
