@@ -1,18 +1,26 @@
 %% language
 
+%% fixed text
+\newcommand{\ofname}[2]{#1/#2}
+\newcommand{\coursename}{Course}
+\newcommand{\professorname}{Professor}
+\newcommand{\assistantname}{Assistant}
+
 \ifthenelse{\equal{\doclanguage}{english}}{
 	%% English
 	\usepackage[english]{babel}
-	\newcommand{\ofname}[2]{#1 of #2}
+	\renewcommand{\ofname}[2]{#1 of #2}
 }{
 \ifthenelse{\equal{\doclanguage}{french}}{
 	%% French
 	\usepackage[francais]{babel}
-	\newcommand{\ofname}[2]{#1 sur #2}
+	\renewcommand{\ofname}[2]{#1 sur #2}
+	\renewcommand{\coursename}{Cours}
+	\renewcommand{\professorname}{Professeur}
+	\renewcommand{\assistantname}{Assistant}
 	\NoAutoSpaceBeforeFDP
 }{
 	%% Other languages
 	% (load english by default)
 	\usepackage[english]{babel}
-	\newcommand{\ofname}[2]{#1/#2}
 }}

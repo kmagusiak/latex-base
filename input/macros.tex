@@ -1,15 +1,49 @@
 %% macros
+\makeatletter
+
+%% \MapList[separator]{function}{list}
+\newcounter{MapList}
+\newcounter{MapListDepth}
+\def\MapList@swallow#1{}
+\def\MapList@do#1#2#3{%
+	\def\MapList@loop##1{%
+		\@ifnextchar\MapList@end%
+		{\MapList@swallow}%
+		{\MapList@apply{##1}}%
+	}%
+	\def\MapList@apply##1##2#2##3\MapList@end{%
+		\stepcounter{MapList}%
+		##1{MapList}{##2}%
+		\expandafter\let\expandafter\MapList@apply\csname MapList@apply-\alph{MapListDepth}\endcsname%
+		\MapList@loop{##1}##3\MapList@end%
+	}%
+	\setcounter{MapList}{0}%
+	\expandafter\let\csname MapList@apply-\alph{MapListDepth}\endcsname\MapList@apply%
+	\MapList@loop{#3}#1#2\MapList@end%
+}
+\def\MapList@call#1#2#3{%
+	\ifthenelse{\equal{#2}{}}{\errmessage{No separator}}{}%
+	\addtocounter{MapListDepth}{1}%
+	\@ifundefined{c@MapList\alph{MapListDepth}}{%
+	\newcounter{MapList\alph{MapListDepth}}}{}%
+	\setcounter{MapList\alph{MapListDepth}}{\value{MapList}}%
+	\MapList@do{#1}{#2}{#3}%
+	\setcounter{MapList}{\value{MapList\alph{MapListDepth}}}%
+	\addtocounter{MapListDepth}{-1}%
+}
+\newcommand{\MapList}[3][,]{\MapList@call{#3}{#1}{#2}}
+\newcommand{\MapListX}[3][,]{\expandafter\MapList@call\expandafter{#3}{#1}{#2}}
 
 %% Images
 \newcommand{\includeimagebase}[2][keepaspectratio=true]{%
-	\includegraphics[#1]{img/#2}
+	\includegraphics[#1]{img/#2}%
 }
 \newcommand{\includeimage}[2][scale=1.0]{
 	\begin{center}
 	\includeimagebase[#1,keepaspectratio=true]{#2}
 	\end{center}
 }
-\long\def\includeimagefigureM@[#1][#2][#3]#4#5{
+\long\def\includeimagefigure@multi[#1][#2][#3]#4#5{
 	\begin{figure}[#2]
 	\centering
 	\vspace{-0.3em}
@@ -24,12 +58,20 @@
 	\vspace{-0.5em}
 	\end{figure}
 }
-\newcommand{\includeimagefigure}{\optparams{\includeimagefigureM@}{[scale=1.0][H][]}}
+\newcommand{\includeimagefigure}{%
+	\optparams{\includeimagefigure@multi}{[scale=1.0][H][]}%
+}
 
 %% References
-\newcommand{\shortref}[1]{\hyperref[#1]{\ref{#1} - \MakeLowercase{\pagename} \pageref{#1}}}
+\newcommand{\shortref}[1]{%
+	\hyperref[#1]{\ref{#1} - \MakeLowercase{\pagename} \pageref{#1}}%
+}
 \newcommand{\textref}[2]{\hyperref[#1]{#2 [\shortref{#1}]}}
 
 %% Other
 \newcommand{\pcomment}[1]{\textit{(#1)}}
 \makeatletter\let\MPtrue\@minipagetrue\makeatother % minipage
+
+%% End
+\makeatother
+

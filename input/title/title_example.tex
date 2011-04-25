@@ -1,5 +1,6 @@
 %% Title page example from:
 %% http://en.wikibooks.org/wiki/LaTeX/Title_Creation
+% \titlepageSupervisor{supervisor}
 
 \makeatletter
 \begin{titlepage}
@@ -11,7 +12,7 @@
 }    
 
 \textsc{\LARGE \docorganization}\\[1.5cm]
-\textsc{\Large Final year project}\\[0.5cm]
+\textsc{\Large \docsubject}\\[0.5cm]
 
 \vfill
 
@@ -30,7 +31,11 @@
 \begin{minipage}{0.4\textwidth}
 \begin{flushright} \large
 \emph{Supervisor:} \\
-{[SUPERVISOR]}
+\ifthenelse{\equal{\titlepageSupervisor}{}}{
+[titlepageSupervisor]
+}{
+\titlepageSupervisor
+}
 \end{flushright}
 \end{minipage}
 

@@ -100,7 +100,10 @@ There are several boxes:
 \fbox{fbox is a box with a frame},
 \parbox{2cm}{parbox has a fixed width},
 \raisebox{2mm}{raisebox}.
-This is a rule: \hfill \\
+\marginpar{marginpar gets here}
+These are two rules:
+\rule{5mm}{2mm}
+\hfill \\
 \rule{\linewidth}{0.3mm}
 
 \paragraph{Minipage}
@@ -120,10 +123,10 @@ text
 center or \lstinline$\centering$
 \end{center}
 \begin{flushright}
-flushright or \lstinline$\raggedright$
+flushright or \lstinline$\raggedleft$
 \end{flushright}
 \begin{flushleft}
-flushleft or \lstinline$\raggedleft$
+flushleft or \lstinline$\raggedright$
 \end{flushleft}
 
 \section{Maths}
@@ -132,10 +135,15 @@ There are some environments for math formulae.
 
 \paragraph{Text mode}
 Included using \lstinline!$...$! or \lstinline$\( ... \)$.
+You can use also \lstinline$\textstyle$ inside a formula.
 
 \paragraph{Displayed mode}
 Included using \lstinline$\[ ... \]$.
 A displayed formula is centered on the page.
+You can use also \lstinline$\displaystyle$ inside a formula.
+
+\paragraph{Explicit mode}
+Text: $\textstyle \sum_i$ - Diplayed: $\displaystyle \sum_i$
 
 \subsection*{Some examples}
 \[ \forall x \in X: \sum_{\alpha \in A} \frac{x^2}{\alpha + 1} \leq 1 \]
