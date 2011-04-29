@@ -24,7 +24,7 @@
 
 \frame{\maketitle}
 
-\frame{
+\frame[allowframebreaks]{
 	\setcounter{tocdepth}{2}
 	\tableofcontents
 	%\tableofcontents[currentsection,hideothersubsections]
@@ -32,6 +32,10 @@
 
 \input{presentation-example}
 
-\frame{\printbibliography}
+%\frame[allowframebreaks]{
+%	\frametitle{\bibname}
+%	\nocite{*}
+%	\printbibliography
+%}
 
 \end{document}

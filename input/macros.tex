@@ -40,14 +40,14 @@
 }
 \newcommand{\includeimage}[2][scale=1.0]{
 	\begin{center}
-	\includeimagebase[#1,keepaspectratio=true]{#2}
+	\includeimagebase[keepaspectratio=true,#1]{#2}
 	\end{center}
 }
 \long\def\includeimagefigure@multi[#1][#2][#3]#4#5{
 	\begin{figure}[#2]
 	\centering
-	\vspace{-0.3em}
-	\includeimagebase[#1,keepaspectratio=true]{#4}
+	\vspace{-0.5em}
+	\includeimagebase[keepaspectratio=true,#1]{#4}
 	\vspace{-1em}
 	\ifthenelse{\equal{#3}{}}{
 		\caption{#5}
@@ -74,4 +74,3 @@
 
 %% End
 \makeatother
-
