@@ -20,6 +20,7 @@ Dependencies
 
 Optional dependencies:
 - dia
+- gnuplot
 - graphviz
 - inkscape or imagemagick
 

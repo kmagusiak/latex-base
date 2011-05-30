@@ -71,11 +71,12 @@ pdf-viewer=$(VIEWER) $(1) $(PDF_LATEX_REDIRECT)
 
 ## Environment options
 VERBOSE=no
+PDF_LATEX_COMMON_FLAGS=--shell-escape
 ifneq (xno,x$(VERBOSE))
-	PDF_LATEX_FLAGS=
+	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS)
 	PDF_LATEX_REDIRECT=
 else
-	PDF_LATEX_FLAGS=-interaction batch
+	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS) -interaction batch
 	PDF_LATEX_REDIRECT=&> /dev/null < /dev/null
 endif
 RECOMPILE=yes
@@ -165,6 +166,7 @@ endif
 		$*.aux $*.bbl $*.blg $*.fax $*.glg $*.glo $*.gls $*.idx \
 		$*.ilg $*.ind $*.ist $*.lof $*.log $*.loh $*.loi $*.lot \
 		$*.nav $*.out $*.snm $*.tns $*.toc $*.vrb \
+		$*.*.gnuplot $*.*.table \
 		$*.run.xml $*-blx.bib
 
 latex-clean: $(DOC:.tex=.tex.clean)
