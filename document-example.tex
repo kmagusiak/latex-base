@@ -483,3 +483,24 @@ An example is the algorithm \ref{alg:example}.
 \caption{An example}
 \label{alg:example}
 \end{algorithm}
+
+\section{Bibliography}
+
+Getting the bibliography at the end of the document usually isn't an easy nor
+fascinating task to do.
+Hopefully, \LaTeX{} has a very good support for it using \texttt{bibtex} and
+optionally a package named
+\texttt{biblatex}\footnote{\url{http://ctan.org/tex-archive/macros/latex/exptl/biblatex/doc/biblatex.pdf}}.
+
+Your bibliography is declared in a separate file with an extension
+\texttt{.bib}, it is parsed and \emph{cited} references are automatically added
+to the end of the document.
+They are properly formatted and even sorted.
+
+To cite an entry, use \lstinline!\cite{name}!.
+For example, \citetitle{latex-comprehensive-symbol} is
+\cite{latex-comprehensive-symbol}.
+There is also an alternative version: \lstinline!\nocite{name}!;
+it will not print anything but the reference will still appear at the end of the
+document.
+A special name \texttt{*} can be used to cite everything.
