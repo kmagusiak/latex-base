@@ -1,0 +1,24 @@
+%% theorem
+
+% \newtheorem[*]{name}[counter]{text}[section]
+% ifthenelse is used to avoid conflicts with Beamer
+
+\theoremstyle{plain}
+\ifthenelse{\isundefined{\lemma}}{
+\newtheorem{lemma}{\lemmaname}
+}{}
+\newtheorem{proposition}{\propositionname}
+\ifthenelse{\isundefined{\theorem}}{
+\newtheorem{theorem}{\theoremname}
+}{}
+
+\theoremstyle{definition}
+\ifthenelse{\isundefined{\definition}}{
+\newtheorem{definition}{\definitionname}
+}{}
+\newtheorem{property}{\propertyname}
+
+\theoremstyle{remark}
+%\newtheorem{example}{\examplename}
+%\newtheorem{note}{\notename}
+\newtheorem{remark}{\remarkname}
