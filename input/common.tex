@@ -36,9 +36,17 @@
 
 %% Fixed text
 \newcommand{\ofname}[2]{#1/#2}
-\newcommand{\coursename}{Course}
-\newcommand{\professorname}{Professor}
 \newcommand{\assistantname}{Assistant}
+\newcommand{\coursename}{Course}
+\newcommand{\definitionname}{Definition}
+\newcommand{\examplename}{Example}
+\newcommand{\lemmaname}{Lemma}
+\newcommand{\notename}{Note}
+\newcommand{\professorname}{Professor}
+\newcommand{\propertyname}{Property}
+\newcommand{\propositionname}{Proposition}
+\newcommand{\remarkname}{Remark}
+\newcommand{\theoremname}{Theorem}
 
 \ifthenelse{\equal{\doclanguage}{english}}{
 	%% English
@@ -49,10 +57,18 @@
 	%% French
 	\usepackage[francais]{babel}
 	\renewcommand{\ofname}[2]{#1 sur #2}
-	\renewcommand{\coursename}{Cours}
-	\renewcommand{\professorname}{Professeur}
 	\renewcommand{\assistantname}{Assistant}
-	\NoAutoSpaceBeforeFDP
+	\renewcommand{\coursename}{Cours}
+	\renewcommand{\definitionname}{Définition}
+	\renewcommand{\examplename}{Exemple}
+	\renewcommand{\lemmaname}{Lemme}
+	\renewcommand{\notename}{Note}
+	\renewcommand{\professorname}{Professeur}
+	\renewcommand{\propertyname}{Propriété}
+	\renewcommand{\propositionname}{Proposition}
+	\renewcommand{\remarkname}{Remarque}
+	\renewcommand{\theoremname}{Theorème}
+	\NoAutoSpaceBeforeFDP % don't add spaces before punctuation
 }{
 	%% Other languages
 	% (load english by default)

@@ -94,7 +94,14 @@ The \texttt{xcolor} package allows you to write {\color{red} in red}.
 
 \subsection{Spaces and boxes}
 \footnote{\url{http://www.personal.ceu.hu/tex/spacebox.htm}}
-The commands are \lstinline$\vspace{length}$, \lstinline$\hfill$, ...
+First, let's describe some spacing commands:
+\begin{itemize}
+\item \lstinline$\vspace{length}$ verical space
+\item \lstinline$\hspace{length}$ horizontal space \hspace{2cm} after 2cm
+\item \lstinline$\hfill$ horizontal fill
+\item \lstinline$\vspace*{\fill}$ dynamically sized vertical space
+\end{itemize}
+
 There are several boxes:
 \mbox{mbox is a simple box},
 \fbox{fbox is a box with a frame},
@@ -128,6 +135,10 @@ flushright or \lstinline$\raggedleft$
 \begin{flushleft}
 flushleft or \lstinline$\raggedright$
 \end{flushleft}
+
+\paragraph{Footnotes}
+A footnote can be added using \lstinline!\footnote{}! which produces
+\footnote{this}.
 
 \section{Maths}
 
@@ -174,6 +185,65 @@ f(a, b)
 \end{equation}
 There is a matrix in the equation \eqref{eq:matrix}.
 
+\section{Extending \LaTeX{} - commands}
+
+New commands and macros are always helpful to speed up writing and to have an
+uniform layout.
+A new command can be defined using \lstinline$\def$ or \lstinline$\newcommand$.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.5\linewidth}
+% source
+\begin{lstlisting}[basicstyle=\scriptsize\ttfamily]
+\def\hello<#1>{hello #1}
+\newcommand{\helloworld}[2][comment]{%
+\hello<#2 \pcomment{#1}>}
+\newenvironment{king}
+{\rule{1ex}{1ex}\hspace{\stretch{1}}}
+{\hspace{\stretch{1}}\rule{1ex}{1ex}}
+
+\helloworld{world}
+\helloworld[invalid message]{nobody}
+
+\begin{king}
+My humble subjects...
+\end{king}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.4\linewidth}
+% result
+\def\hello<#1>{hello #1}
+\newcommand{\helloworld}[2][comment]{%
+\hello<#2 \pcomment{#1}>}
+\newenvironment{king}
+{\rule{1ex}{1ex}\hspace{\stretch{1}}}
+{\hspace{\stretch{1}}\rule{1ex}{1ex}}
+
+\helloworld{world}
+\helloworld[invalid message]{nobody}
+
+\begin{king}
+My humble subjects...
+\end{king}
+% end result
+\end{minipage}
+\caption{Example of command definition}
+\end{figure}
+
+\paragraph{Redeclaration}
+\lstinline$\newcommand$ and \lstinline$\newenvironment$ issues an error when the
+function already exists.
+There exists also macros for re-declaring commands and environments:
+\lstinline$\renewcommand$ and \lstinline$\renewenvironment$.
+
+\subsection*{Other packages}
+\begin{itemize}
+\item \texttt{ifthen}: conditional compilation
+\item \texttt{keyval}: key-value parameters
+\item \texttt{optparams}: multiple optional parameters
+\end{itemize}
+
 \section{References}
 \label{sec:ref}
 
@@ -191,6 +261,75 @@ Then a reference can be included using:
 \item \texttt{shortref} (macro) - \shortref{sec:ref}
 \item \texttt{textref} (macro) - \textref{sec:ref}{some text}
 \end{itemize}
+
+\subsection{Counters}
+
+Counters are used to declare any numbers present in the document.
+
+We can declare new counters or use existing ones.
+A counter has a value (which is not directly printable), it is reset when the
+parent has been incremented; also it can be used for references.
+\begin{lstlisting}{style=latex}
+\newcounter{name}[parent] % declares a new counter
+\setcounter{name}{value} % sets the value
+\addtocounter{name}{value} % adds a value
+\stepcounter{name} % increments
+\refstepcounter{name} % increments and is used by labels
+\usecounter{name} % usage
+\end{lstlisting}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|}\hline
+Command & Output \\ \hline
+\lstinline!\alph{}! & \alph{section} \\
+\lstinline!\Alph{}! & \Alph{section} \\
+\lstinline!\arabic{}! & \arabic{section} \\
+\lstinline!\roman{}! & \roman{section} \\
+\lstinline!\Roman{}! & \Roman{section} \\
+\hline
+\end{tabular}
+\caption{Rendering of the counter named \texttt{section}}
+\end{table}
+
+\subsection{Theorems}
+
+Theorems in \LaTeX are more general than simpe theorems in maths.
+There is an environment for declaring "types of theorems".
+This is done in the preamble of the document.
+\begin{lstlisting}
+\newtheorem{name}[counter]{text}[section]
+\end{lstlisting}
+This command declares a theorem type named \texttt{name} using a named counter
+which is reset at every section, subsection, etc.
+There also is \lstinline!\newtherem*! does not use any counters.
+\texttt{text} defines here what should be printed in the document as the type of
+the theorem.
+
+This document (and also Beamer) defines some theorem types such as
+\textit{lemma}, \textit{theorem}, \textit{definition}, ...
+Also, \lstinline!\theoremstyle! can be used to declare new formatting for
+theorems; the predefined formattings are \textit{plain}, \textit{definition} and
+\textit{remark}.
+
+\begin{definition}
+Some standard definition.
+\end{definition}
+
+\begin{theorem}
+My theorem...
+\end{theorem}
+\begin{theorem}
+Another theorem...
+\begin{proof}
+This is the \emph{proof} environment...
+\end{proof}
+\end{theorem}
+
+\newtheorem{mydef}{$\Rightarrow$ DEF}
+\begin{mydef}
+mydef usage declared as \lstinline!\newtheorem{mydef}{$\Rightarrow$ DEF}!.
+\end{mydef}
 
 \section{Figures}
 
@@ -320,8 +459,9 @@ def main():
 
 Writing abstract algorithms can be done using \texttt{algorithmicx} and
 \texttt{algpseudocode} package.
+An example is the algorithm \ref{alg:example}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Require precondition
 \Ensure postcondition
@@ -341,63 +481,5 @@ Writing abstract algorithms can be done using \texttt{algorithmicx} and
 \EndLoop
 \end{algorithmic}
 \caption{An example}
+\label{alg:example}
 \end{algorithm}
-
-\section{Extending \LaTeX{}}
-
-New commands and macros are always helpful to speed up writing and to have an
-uniform layout.
-A new command can be defined using \lstinline$\def$ or \lstinline$\newcommand$.
-
-\begin{figure}[H]
-\centering
-\begin{minipage}{0.5\linewidth}
-% source
-\begin{lstlisting}[basicstyle=\scriptsize\ttfamily]
-\def\hello<#1>{hello #1}
-\newcommand{\helloworld}[2][comment]{%
-\hello<#2 \pcomment{#1}>}
-\newenvironment{king}
-{\rule{1ex}{1ex}\hspace{\stretch{1}}}
-{\hspace{\stretch{1}}\rule{1ex}{1ex}}
-
-\helloworld{world}
-\helloworld[invalid message]{nobody}
-
-\begin{king}
-My humble subjects...
-\end{king}
-\end{lstlisting}
-\end{minipage}
-\begin{minipage}{0.4\linewidth}
-% result
-\def\hello<#1>{hello #1}
-\newcommand{\helloworld}[2][comment]{%
-\hello<#2 \pcomment{#1}>}
-\newenvironment{king}
-{\rule{1ex}{1ex}\hspace{\stretch{1}}}
-{\hspace{\stretch{1}}\rule{1ex}{1ex}}
-
-\helloworld{world}
-\helloworld[invalid message]{nobody}
-
-\begin{king}
-My humble subjects...
-\end{king}
-% end result
-\end{minipage}
-\caption{Example of command definition}
-\end{figure}
-
-\paragraph{Redeclaration}
-\lstinline$\newcommand$ and \lstinline$\newenvironment$ issues an error when the
-function already exists.
-There exists also macros for re-declaring commands and environments:
-\lstinline$\renewcommand$ and \lstinline$\renewenvironment$.
-
-\subsection*{Other packages}
-\begin{itemize}
-\item \texttt{ifthen}: conditional compilation
-\item \texttt{keyval}: key-value parameters
-\item \texttt{optparams}: multiple optional parameters
-\end{itemize}
