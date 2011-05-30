@@ -22,11 +22,12 @@ DOCUMENTS=$(DOC:.tex=.pdf)
 IMG_ROOT_DIR=img
 IMG_DYNAMIC_EXT=png
 IMG_FOUND=$(sort $(foreach ext, jpg png, \
-	$(shell find $(IMG_ROOT_DIR) -name *.$(ext))))
-IMG_SRC=$(sort $(foreach ext, dia dot sh svg, \
-	$(shell find $(IMG_ROOT_DIR) -name *.$(ext))))
+	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
+IMG_SRC_EXTENSIONS=dia dot pdf sh svg
+IMG_SRC=$(sort $(foreach ext, $(IMG_SRC_EXTENSIONS), \
+	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
 IMG_GENERATED=$(sort $(filter %.$(IMG_DYNAMIC_EXT), \
-	$(forall ext, dia dot sh svg, \
+	$(forall ext, $(IMG_SRC_EXTENSIONS), \
 	$(patsubst %.$(ext),%.$(IMG_DYNAMIC_EXT), $(IMG_SRC)))))
 IMG_ALL=$(sort $(IMG_FOUND) $(IMG_GENERATED))
 IMG_STATIC=$(filter-out $(IMG_GENERATED), $(IMG_ALL))
@@ -61,6 +62,10 @@ endef
 define pdf-latex # $1: tex file
 	pdflatex $(PDF_LATEX_FLAGS) $(1) $(PDF_LATEX_REDIRECT) || ( \
 		$(RM) $(1:.tex=.pdf) && false)
+endef
+# LaTeX recompile rule
+define pdf-latex-recompile # $1: tex file
+	grep -E '(There were undefined references|rerun to get)' "$*.log" &> /dev/null
 endef
 # Makes the bibliography file ($1: bib file)
 pdf-bibtex=bibtex $(1:.bib=) $(PDF_LATEX_REDIRECT)
@@ -145,12 +150,17 @@ latex: $(DOCUMENTS)
 .tex.pdf:
 	@$(MSG_BEGIN) LaTeX compile: $* $(MSG_END)
 	$(call pdf-latex,$<)
-	test ! -f "$*.aux" || $(MAKE) "$*.bbl"
-	test ! -f "$*.idx" || $(MAKE) "$*.ind"
+	test ! -f "$*.aux" \
+		|| grep -v -E '\\(cit|bib)' "$*.aux" &> /dev/null \
+		|| ($(MAKE) "$*.bbl"; echo "rerun to get the bibliography" >> "$*.log")
+	test ! -f "$*.idx" \
+		|| ($(MAKE) "$*.ind"; echo "rerun to get the index" >> "$*.log")
 ifeq (x$(RECOMPILE),xyes)
-	@$(MSG_BEGIN) LaTeX recompile: $* $(MSG_END)
-	$(call pdf-latex,$<)
-	$(call pdf-latex,$<)
+	! ($(call pdf-latex-recompile,$<)) || ( \
+	$(MSG_BEGIN) LaTeX recompile: $* $(MSG_END);\
+	$(call pdf-latex,$<); \
+	$(call pdf-latex,$<); \
+	)
 endif
 
 .aux.bbl:
@@ -188,6 +198,10 @@ images: $(IMG_ALL)
 .dot.$(IMG_DYNAMIC_EXT):
 	@$(MSG_BEGIN) Generating $(IMG_DYNAMIC_EXT) from: $< $(MSG_END)
 	( cd $(dir $<) && dot -T$(IMG_DYNAMIC_EXT) -o $(notdir $@) $(notdir $<) )
+
+.pdf.$(IMG_DYNAMIC_EXT):
+	@$(MSG_BEGIN) Generating $(IMG_DYNAMIC_EXT) from: $< $(MSG_END)
+	convert -density 600x600 $< $@
 
 .sh.$(IMG_DYNAMIC_EXT):
 	@$(MSG_BEGIN) Generating $(IMG_DYNAMIC_EXT) using: $< $(MSG_END)

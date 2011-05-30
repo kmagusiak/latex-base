@@ -35,6 +35,7 @@ LaTeX files and input directory
 - presentation.tex: a Beamer presentation
 	(contains the body, metadata and an example)
 - presentation-article.tex: presentation.tex rendered as an article
+- tikz.tex: a generated image
 
 The directory input contains files that are included by the documents to add
 macros, import a set of packages, define the theme, etc. A document should
