@@ -1,6 +1,8 @@
 latex-base TODO list (sorted by priority)
 =========================================
 
+* Including vectorial images without passing through png
+* Optional import for listings and tikz to reduce compilation times
 * A script to update and create copies of the templates used in other projects
 is needed.
 	- something like diff3?
