@@ -24,11 +24,12 @@
 
 \frame{\maketitle}
 
+\ifthenelse{\isundefined{\doctocdepth}}{}{
 \frame[allowframebreaks]{
-	\setcounter{tocdepth}{2}
+	\setcounter{tocdepth}{\doctocdepth}
 	\tableofcontents
 	%\tableofcontents[currentsection,hideothersubsections]
-}
+}}
 
 \input{presentation-example}
 
