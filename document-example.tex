@@ -451,34 +451,48 @@ class Hello:
 	"""
 	does something
 	"""
-	def __init__(boom):
-		print(1 + "hello world")
+	def __init__(self, name='world'):
+		print("hello " + name)
 def main():
 	bla = lambda x : x + 1
+if __name__ == '__main__':
+	h = Hello()
+	main()
 \end{lstlisting}
 
 Writing abstract algorithms can be done using \texttt{algorithmicx} and
 \texttt{algpseudocode} package.
 An example is the algorithm \ref{alg:example}.
 
+There is a lot of commands that enable you to format your code;
+here is a brief list of them:
+\texttt{For}, \texttt{ForAll}, \texttt{While}, \texttt{Loop},
+\texttt{Repeat-Until}, \texttt{If-ElsIf-Else}, ...
+
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Require precondition
 \Ensure postcondition
-\State $y \leftarrow 1$
+\State $y \gets 1$
 	\Comment{a comment}
-\For{$i = 1 \to 10$} 
+\If{$y < 0$}
+	\State negative
+\ElsIf{$y > 0$}
+	\State positive
+\Else
+	\State noop
+\EndIf
+\For{$i = 1 \to 10$}
 	\State $i \gets i + 1$
 \EndFor
-\While{condition}
-	\State things
-\EndWhile
-\Repeat
-	\State something
-\Until{condition}
 \Loop
-	\State $i \leftarrow \infty$
+	\State $i \gets \infty$
+	\State \Call{name}{\texttt{null}}
 \EndLoop
+\Statex
+\Function{name}{arguments}
+	\State \Return Nothing
+\EndFunction
 \end{algorithmic}
 \caption{An example}
 \label{alg:example}
