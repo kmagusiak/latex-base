@@ -9,7 +9,10 @@ GEN_FROM = 'Makefile.files'
 IMG_ROOT_DIR = 'img'
 IMG_EXT_NORMAL = ['eps', 'jpg', 'pdf', 'png']
 IMG_EXT_DEF = 'pdf' # must be in IMG_EXT_NORMAL
-LISTINGS_EXT = ['c', 'cpp', 'idl', 'java', 'h', 'py', 'tex']
+LISTINGS_EXT = [
+	'c', 'cpp', 'erl', 'h', 'hs',
+	'idl', 'java', 'lsp', 'php',
+	'py', 'tex']
 
 def getTexFileDep(filename, dep = None):
 	"""Generates dependencies for a tex file."""
