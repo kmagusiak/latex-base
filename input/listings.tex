@@ -34,7 +34,8 @@
 
 %% Default
 \lstdefinestyle{defaultColors}{
-	commentstyle=\color{listingsComment}\itshape
+	basicstyle=\ttfamily
+	,commentstyle=\color{listingsComment}\itshape
 	,identifierstyle=\color{listingsIdentifier}
 	,keywordstyle=\color{listingsKeyword}\bfseries
 	,stringstyle=\color{listingsString}
@@ -46,6 +47,21 @@
 }
 \lstdefinestyle{cpp}{style=c
 	,language=c++
+}
+
+%% Erlang
+\lstdefinestyle{erlang}{style=defaultColors
+	,language=erlang
+}
+
+%% Haskell
+\definecolor{colHaskellBase}{rgb}{0,0.3,0}
+\definecolor{colHaskellKeyword}{rgb}{0,0.4,0.8}
+\lstdefinestyle{haskell}{style=defaultColors
+	,language=Haskell
+	,basicstyle=\ttfamily\color{colHaskellBase}
+	,identifierstyle=\color{black}
+	,keywordstyle=\color{colHaskellKeyword}\bfseries
 }
 
 %% IDL
@@ -60,6 +76,16 @@
 \lstdefinestyle{java}{style=defaultColors
 	,language=java
 	,keywordstyle=\color{colJavaKeyword}\bfseries
+}
+
+%% Lisp
+\lstdefinestyle{lisp}{style=defaultColors
+	,language=Lisp
+}
+
+%% PHP
+\lstdefinestyle{php}{style=defaultColors
+	,language=php
 }
 
 %% Python
