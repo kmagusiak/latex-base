@@ -151,7 +151,7 @@ latex: $(DOCUMENTS)
 	@$(MSG_BEGIN) LaTeX compile: $* $(MSG_END)
 	$(call pdf-latex,$<)
 	test ! -f "$*.aux" \
-		|| grep -v -E '\\(cit|bib)' "$*.aux" &> /dev/null \
+		|| ! grep -E '\\(cit|bib)' "$*.aux" &> /dev/null \
 		|| ($(MAKE) "$*.bbl"; echo "rerun to get the bibliography" >> "$*.log")
 	test ! -f "$*.idx" \
 		|| ($(MAKE) "$*.ind"; echo "rerun to get the index" >> "$*.log")
