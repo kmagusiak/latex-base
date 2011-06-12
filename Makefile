@@ -20,15 +20,18 @@ DOCUMENTS=$(DOC:.tex=.pdf)
 
 ## Images
 IMG_ROOT_DIR=img
-IMG_DYNAMIC_EXT=png
-IMG_FOUND=$(sort $(foreach ext, jpg png, \
+IMG_STATIC_EXTENSIONS=eps jpg pdf png
+IMG_FOUND=$(sort $(foreach ext, $(IMG_STATIC_EXTENSIONS), \
 	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
-IMG_SRC_EXTENSIONS=dia dot pdf sh svg
+IMG_SRC_EXTENSIONS=dia dot sh svg tex
 IMG_SRC=$(sort $(foreach ext, $(IMG_SRC_EXTENSIONS), \
 	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
-IMG_GENERATED=$(sort $(filter %.$(IMG_DYNAMIC_EXT), \
-	$(forall ext, $(IMG_SRC_EXTENSIONS), \
-	$(patsubst %.$(ext),%.$(IMG_DYNAMIC_EXT), $(IMG_SRC)))))
+IMG_GENERATED=$(sort \
+	$(filter %.pdf, $(foreach ext, dia dot svg tex, \
+	$(patsubst %.$(ext),%.pdf, $(IMG_SRC)))) \
+	$(filter %.png, $(foreach ext, sh, \
+	$(patsubst %.$(ext),%.png, $(IMG_SRC)))) \
+	)
 IMG_ALL=$(sort $(IMG_FOUND) $(IMG_GENERATED))
 IMG_STATIC=$(filter-out $(IMG_GENERATED), $(IMG_ALL))
 
@@ -60,12 +63,14 @@ define rm-echo-dir # $1: dirname
 endef
 # Compiles a tex file into a pdf file
 define pdf-latex # $1: tex file
-	pdflatex $(PDF_LATEX_FLAGS) $(1) $(PDF_LATEX_REDIRECT) || ( \
+	pdflatex $(PDF_LATEX_FLAGS) -output-directory "$(dir $(1))" \
+		"$(1)" $(PDF_LATEX_REDIRECT) || ( \
 		$(RM) $(1:.tex=.pdf) && false)
 endef
 # LaTeX recompile rule
 define pdf-latex-recompile # $1: tex file
-	grep -E '(There were undefined references|rerun to get)' "$*.log" &> /dev/null
+	grep -E '(There were undefined references|rerun to get)' \
+		"$*.log" &> /dev/null
 endef
 # Makes the bibliography file ($1: bib file)
 pdf-bibtex=bibtex $(1:.bib=) $(PDF_LATEX_REDIRECT)
@@ -117,10 +122,12 @@ help:
 	@echo "%.pdf.view: compiles and opens a pdf file"
 	@echo "%.tex.clean: cleans temporary files after compilation"
 	@$(MSG_BEGIN) File transformations $(MSG_END)
+	@echo "dia -> {eps,pdf,png} (using dia)"
+	@echo "dot -> {eps,pdf,png} (using graphviz)"
+	@echo "eps -> pdf (using epspdf)"
+	@echo "pdf -> png (using imagemagick)"
+	@echo "svg -> {eps,pdf,png} (using inkscape or imagemagick)"
 	@echo "tex -> pdf (using pdflatex)"
-	@echo "dia -> $(IMG_DYNAMIC_EXT) (using dia)"
-	@echo "dot -> $(IMG_DYNAMIC_EXT) (using graphviz)"
-	@echo "svg -> $(IMG_DYNAMIC_EXT) (using inkscape or convert)"
 	@$(MSG_BEGIN) Environment variables $(MSG_END)
 	@echo "RECOMPILE: whether LaTeX files are recompiled"
 	@echo "VERBOSE: when set, latex command prints the output"
@@ -191,31 +198,39 @@ latex-distclean: latex-clean
 
 images: $(IMG_ALL)
 
-.dia.$(IMG_DYNAMIC_EXT):
-	@$(MSG_BEGIN) Generating $(IMG_DYNAMIC_EXT) from: $< $(MSG_END)
+%.eps %.pdf %.png: %.dia
+	@$(MSG_BEGIN) Generating $@ from dia $(MSG_END)
 	( cd $(dir $<) && dia --export=$(notdir $@) $(notdir $<) )
 
-.dot.$(IMG_DYNAMIC_EXT):
-	@$(MSG_BEGIN) Generating $(IMG_DYNAMIC_EXT) from: $< $(MSG_END)
-	( cd $(dir $<) && dot -T$(IMG_DYNAMIC_EXT) -o $(notdir $@) $(notdir $<) )
+%.eps %.pdf %.png: %.dot
+	@$(MSG_BEGIN) Generating $@ from dot $(MSG_END)
+	( cd $(dir $<) && dot -T$(subst .,,$(suffix $@)) \
+		-o $(notdir $@) $(notdir $<) )
 
-.pdf.$(IMG_DYNAMIC_EXT):
-	@$(MSG_BEGIN) Generating $(IMG_DYNAMIC_EXT) from: $< $(MSG_END)
+.eps.pdf:
+	@$(MSG_BEGIN) Generating $@ from pdf $< $(MSG_END)
+	epspdf $< $@
+
+.pdf.png:
+	@$(MSG_BEGIN) Generating $@ from pdf $(MSG_END)
 	convert -density 600x600 $< $@
 
-.sh.$(IMG_DYNAMIC_EXT):
-	@$(MSG_BEGIN) Generating $(IMG_DYNAMIC_EXT) using: $< $(MSG_END)
-	( cd $(dir $<) && ./$(notdir $<) $(IMG_DYNAMIC_EXT) > $(notdir $@) )
+.sh.png:
+	@$(MSG_BEGIN) Generating $@ from sh $(MSG_END)
+	( cd $(dir $<) && ./$(notdir $<) png > $(notdir $@) )
 
-.svg.$(IMG_DYNAMIC_EXT):
-	@$(MSG_BEGIN) Generating $(IMG_DYNAMIC_EXT) from: $< $(MSG_END)
+%.eps %.pdf %.png: %.svg
+	@$(MSG_BEGIN) Generating $@ from svg $(MSG_END)
 	which inkscape &> /dev/null && ( \
-		inkscape --export-$(IMG_DYNAMIC_EXT)=$@ $< \
+		inkscape --export-$(subst .,,$(suffix $@))=$@ $< \
 	) || ( \
 		convert $< $@ \
 	)
 
 images-clean:
+	$(foreach f, $(filter %.tex, $(IMG_SRC)), \
+		$(MAKE) $(f).clean; )
+	find "$(IMG_ROOT_DIR)" -name "*-eps-converted-to.pdf" | xargs $(RM)
 
 images-distclean: images-clean
 	$(foreach f,$(IMG_GENERATED),$(call rm-echo,$(f));)
@@ -268,4 +283,4 @@ FORCE: ; @true
 	images images-clean images-distclean \
 	latex latex-clean latex-distclean \
 	list
-.SUFFIXES: .aux .bib .bbl .dia .dot .idx .ind .pdf .png .svg .tex
+.SUFFIXES: .aux .bib .bbl .dia .dot .eps .idx .ind .pdf .png .svg .tex
