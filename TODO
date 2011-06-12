@@ -6,5 +6,5 @@ latex-base TODO list (sorted by priority)
 is needed.
 	- something like diff3?
 * Add a beamer template.
-* Personaly, Makefiles suit me, but python script to compile documents might be
+* Personally, Makefiles suit me, but python script to compile documents might be
 more extensible.
