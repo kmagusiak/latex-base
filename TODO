@@ -1,7 +1,6 @@
 latex-base TODO list (sorted by priority)
 =========================================
 
-* Integrate diff in cloning
 * Add a beamer template.
 * Personally, Makefiles suit me, but python script to compile documents might be
 more extensible.
