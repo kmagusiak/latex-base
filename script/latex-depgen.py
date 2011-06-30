@@ -1,14 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Quick LaTeX file dependency generator
 
-import re
 import os.path
+import re
 import sys
 
 GEN_FROM = 'Makefile.files'
 IMG_ROOT_DIR = 'img'
 IMG_EXT_NORMAL = ['eps', 'jpg', 'pdf', 'png']
-IMG_EXT_DEF = 'pdf' # must be in IMG_EXT_NORMAL
+IMG_EXT_DEF = 'pdf'
+assert IMG_EXT_DEF in IMG_EXT_NORMAL
 LISTINGS_EXT = [
 	'c', 'cpp', 'erl', 'h', 'hs',
 	'idl', 'java', 'lsp', 'php',
@@ -33,9 +34,7 @@ def getTexFileDep(filename, dep = None):
 		match_opt = '(?:\\[[^\\]]*\\])?'
 		match_opt_arg = match_opt + match_arg
 		old_line = ''
-		while True:
-			line = f.readline()
-			if line == '': break # eof
+		for line in f:
 			(line, unfinished) = stripLatexLine(line, old_line)
 			if unfinished:
 				old_line = line
