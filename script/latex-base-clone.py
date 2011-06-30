@@ -17,23 +17,38 @@ def multi_call(n, f, arg):
 		n -= 1
 	return arg
 
-def prompt(message='Input:', choice=None):
+def prompt(message='Input:', choice=None, default=None):
 	""" Prompts a user to enter some text."""
 	while True:
 		response = raw_input(message + ' ')
 		if choice is not None:
 			response = response.lower()
+			if (len(response) == 0
+				and default is not None
+				and response not in choice):
+				response = default.lower()
 			if response in choice:
 				return choice[response]
 			else:
 				print('Invalid response.')
 		elif len(response) > 0:
 			return response
+		elif default is not None:
+			return default
 
-def confirm(message='Confirm?'):
+def confirm(message='Confirm?', default=None):
 	""" The user replies by yes or no. """
-	message += ' [y/n]'
-	return prompt(message=message, choice={
+	if default is None:
+		message += ' [y/n]'
+	elif default:
+		default = 'y'
+		message += ' [Y/n]'
+	else:
+		default = 'n'
+		message += ' [y/N]'
+	return prompt(message=message,
+		default=default,
+		choice={
 		'yes': True, 'y': True,
 		'no': False, 'n': False})
 
@@ -74,7 +89,14 @@ def file_update(dest, src, only_create=False):
 	if os.path.exists(dest):
 		if only_create or os.path.getctime(dest) >= os.path.getctime(src):
 			return
-		if not confirm("Overwrite file '%s'?"):
+		print("File already exists: %s" % dest)
+		if confirm("Show diff?", default=False):
+			pdiff = subprocess.Popen(['diff', '-u', src, dest],
+				stdout=subprocess.PIPE)
+			pless = subprocess.Popen(['less'],
+				stdin=pdiff.stdout)
+			pless.wait()
+		if not confirm("Overwrite the file?"):
 			raise AbortException()
 	print('Updating file: %s' % dest)
 	shutil.copyfile(src, dest)
@@ -155,9 +177,9 @@ def update_template(name, dest, src, deps=None):
 	if os.path.exists(f_dest) and not confirm(
 		"File already exists, overwrite?"):
 		raise AbortException()
+	file_update(f_dest, f_src)
 	if deps is None:
-		deps = confirm("Copy dependencies?")
-	shutil.copyfile(f_src, f_dest)
+		deps = confirm("Copy dependencies?", default=True)
 	if not deps: return
 	# Make depend
 	print('> make depend (cwd: %s)' % src)
