@@ -26,16 +26,20 @@ some text
 	\begin{alertblock}{[alertblock]} ABC \end{alertblock}
 }
 
-\colorlet{structurebackup}{structure}
-\colorlet{structure}{magenta}
-\usestructuretemplate{\color{structure}}{}
+%\beamertemplatesolidbackgroundcolor{white}
 \beamertemplateshadingbackground{yellow!50}{white!50}
 \frame{
 	\frametitle{Highlighting and background colors}
 	Normal, \alert{alert}, \structure{structure}.
+	\par And a box:
+	\setlength{\fboxrule}{2pt}
+	\setlength{\fboxsep}{2pt}
+	\fcolorbox{blue}{green!25}{
+		\textcolor{gray}{
+			Some text...
+		}
+	}
 }
-\colorlet{structure}{structurebackup}
-%\beamertemplatesolidbackgroundcolor{white}
 \beamertemplateshadingbackground{white}{white}
 
 \subsection{Options}
@@ -44,7 +48,7 @@ some text
 	\frametitle{Plain frame}
 	\texttt{plain} frame removes header, footers, etc.
 	to leave as much space as possible
-	
+	\par
 	Also, contents of this frame are aligned to the top by giving an option
 	\texttt{t}.
 }
@@ -58,7 +62,6 @@ some text
 	\frametitle{Shrunk frame}
 	\texttt{shrink} option means that the contents will be shrunk if there is
 	not enough space on the frame
-	
 	\vspace{5cm}
 	some text;
 	here vertical space was added to force the shrinking
@@ -143,7 +146,7 @@ int main(void) {
 	\texttt{\textbackslash{}pause} can be added nearly anywhere to stop drawing
 	at that point and continue later
 	\pause
-	
+	\par
 	...that's nice
 }
 
@@ -167,4 +170,29 @@ int main(void) {
 	\item<+-> point 3
 	\end{itemize}
 	\transdissolve
+}
+
+\frame{
+	\frametitle{Highlighting bullets}
+	\framesubtitle{Using \texttt{\textbackslash{}alt}}
+	This is done using \texttt{%
+		\textbackslash{}alt\textless{}overlay\textgreater%
+		\{in overlay\}\{out of overlay\}}.
+	\begin{itemize}
+	\item<1-> \alt<2>{\color{blue}}{\color{gray}} point one
+	\item<1-> \alt<3>{\color{blue} point two}{\color{gray} point ---}
+	\end{itemize}
+}
+
+\def\hilite<#1>{\temporal<#1>%
+{\color{gray}}{\color{blue}}{\color{black}}%
+}
+\frame{
+	\frametitle{Other highlighting}
+	\framesubtitle{Using \texttt{\textbackslash{}temporal}}
+	\begin{itemize}
+	\hilite<2>\item one
+	\hilite<3>\item two
+	\hilite<4>\item three
+	\end{itemize}
 }
