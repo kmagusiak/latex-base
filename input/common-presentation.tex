@@ -14,3 +14,7 @@
 %% Styles and commands
 \input{input/macros}
 \renewcommand{\pcomment}[1]{\begin{scriptsize}(#1)\end{scriptsize}}
+
+%% Beamer options
+\DeclareOptionBeamer{compress}{\beamer@compresstrue}
+\ProcessOptionsBeamer

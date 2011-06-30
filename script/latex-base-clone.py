@@ -95,6 +95,7 @@ def file_update(dest, src, only_create=False):
 				stdout=subprocess.PIPE)
 			pless = subprocess.Popen(['less'],
 				stdin=pdiff.stdout)
+			pdiff.stdout.close() # allow diff to receive SIGPIPE
 			pless.wait()
 		if not confirm("Overwrite the file?"):
 			raise AbortException()

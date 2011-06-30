@@ -1,12 +1,16 @@
 %% Presentation body
 
 %% Title page
-\author{\docauthor}
-\title{\sc\doctitle}
-\ifthenelse{\equal{\docsubtitle}{}}{}{\subtitle{\docsubtitle}}
+\author[\docshortauthor]{\docauthor}
+\title[\docshorttitle]{\sc\doctitle}
+\ifthenelse{\equal{\docsubtitle}{}}{}{
+\subtitle{\docsubtitle}
+}
 \subject{\docsubject}
 \date{\docdate}
-\institute{\docorganization}
+\ifthenelse{\equal{\docorganization}{}}{}{
+\institute[\docshortorganization]{\docorganization}
+}
 \ifthenelse{\equal{\doclogo}{}}{
 %\logo{default-logo}
 }{
@@ -29,7 +33,6 @@
 \frame[allowframebreaks]{
 	\setcounter{tocdepth}{\doctocdepth}
 	\tableofcontents
-	%\tableofcontents[currentsection,hideothersubsections]
 }}}
 
 \input{presentation-example}

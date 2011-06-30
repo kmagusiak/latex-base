@@ -31,6 +31,7 @@ def getTexFileDep(filename, dep = None):
 	# analyse the lines of the given file
 	with open(filename, 'r') as f:
 		match_arg = '\\{(.+?)\\}'
+		match_arg_ignore = '\\{.+?\\}'
 		match_opt = '(?:\\[[^\\]]*\\])?'
 		match_opt_arg = match_opt + match_arg
 		old_line = ''
@@ -65,6 +66,11 @@ def getTexFileDep(filename, dep = None):
 				'\\\\includeimage(?:base|figure)?' + match_opt_arg,
 				ext = IMG_EXT_NORMAL, extdef = IMG_EXT_DEF,
 				dir = IMG_ROOT_DIR)
+			# pgfdeclareimage
+			getTexFileDepMatch(dep, line,
+				'\\\\pgfdeclareimage' + match_opt
+					+ match_arg_ignore + match_arg,
+				ext = IMG_EXT_NORMAL, extdef = IMG_EXT_DEF)
 			# lstinputlisting
 			getTexFileDepMatch(dep, line,
 				'\\\\lstinputlisting' + match_opt_arg,

@@ -2,8 +2,12 @@
 
 \input{input/common-presentation}
 
+%% TikZ (drawing)
+\input{input/tikz}
+
 %% Theme
-%% see: http://www.hartwork.org/beamer-theme-matrix/
+%% matrix: http://www.hartwork.org/beamer-theme-matrix/
+%% info: http://en.wikibooks.org/wiki/LaTeX/Presentations
 
 %\usetheme{Bergen}
 %\usetheme{CambridgeUS}
@@ -14,8 +18,27 @@
 %\usetheme{Singapore}
 \usetheme{Warsaw}
 
+%\useoutertheme{infolines}
+%\useoutertheme{miniframes}
+%\useoutertheme{tree}
+
+%\useinnertheme{circles}
+%\useinnertheme{inmargin}
+%\useinnertheme{rectangles}
+%\useinnertheme{rounded}
+
+%% Handout adaptations
+\mode<handout>{
+%\usepackage{pgfpages}
+%\pgfpagesuselayout{2 on 1}[a4paper,border shrink=4mm]
+%\pgfpagesuselayout{4 on 1}[a4paper,landscape,border shrink=4mm]
+}
+
+%% Colors
+\mode<presentation>{
 %\usecolortheme{beaver}
 %\usecolortheme{beetle}
+\usecolortheme{default}
 %\usecolortheme{dolphin}
 %\usecolortheme{dove}
 %\usecolortheme{fly}
@@ -28,6 +51,18 @@
 %\setbeamercolor{normal text}{fg=black!80,bg=beamerTextBackground}
 %\setbeamercolor{block body}{fg=black!80,bg=beamerTextBackground}
 %\setbeamercolor{frametitle}{fg=yellow}
+}
+\mode<handout>{
+\usecolortheme{dove}
+%\usecolortheme{seahorse}
+}
+
+%% Background image
+\mode<presentation>{
+%\pgfdeclareimage[height=\paperheight,width=\paperwidth]%
+%{beamerBG}{img/logo}
+%\setbeamertemplate{background}{\pgfuseimage{beamerBG}}
+}
 
 %% Templates
 %\setbeamertemplate{itemize item}[ball]
@@ -53,6 +88,3 @@
 %	\tableofcontents[currentsection,hideothersubsections]
 %	\end{frame}
 %}
-
-%% TikZ (drawing)
-\input{input/tikz}
