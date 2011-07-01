@@ -64,10 +64,9 @@ class AbortException(Exception):
 		super(Exception, self).__init__(message)
 
 def dir_update(dest, recursive_src=None):
-	if os.path.isdir(dest):
-		return
-	print('Creating directory: %s' % dest)
-	os.mkdir(dest)
+	if not os.path.isdir(dest):
+		print('Creating directory: %s' % dest)
+		os.mkdir(dest)
 	if recursive_src is None:
 		return
 	for f in os.listdir(recursive_src):
@@ -87,11 +86,11 @@ def file_update(dest, src, only_create=False):
 	if not os.path.exists(src):
 		raise AbortException('Source does not exist: %s' % src)
 	if os.path.exists(dest):
-		if only_create or os.path.getctime(dest) >= os.path.getctime(src):
-			return
+		if only_create or os.path.getmtime(dest) >= os.path.getmtime(src):
+			return False
 		print("File already exists: %s" % dest)
 		if confirm("Show diff?", default=False):
-			pdiff = subprocess.Popen(['diff', '-u', src, dest],
+			pdiff = subprocess.Popen(['diff', '-u', dest, src],
 				stdout=subprocess.PIPE)
 			pless = subprocess.Popen(['less'],
 				stdin=pdiff.stdout)
@@ -101,6 +100,7 @@ def file_update(dest, src, only_create=False):
 			raise AbortException()
 	print('Updating file: %s' % dest)
 	shutil.copyfile(src, dest)
+	return True
 
 def update_files(dest, src):
 	""" Updates the files by copying what is necessary """
@@ -114,55 +114,70 @@ def update_files(dest, src):
 	for f in ['Makefile']:
 		file_update(os.path.join(dest, f), os.path.join(src, f))
 	# file: Makefile.files
-	def mkfs_replace(f):
-		with open(f, 'r+') as fp:
-			lines = []
-			rem = False
-			for l in fp:
-				if rem:
-					if l.startswith("\t"): continue
-					rem = False
-				elif l.startswith("DOC="):
-					rem = True
-					l = "DOC=\n"
-				lines.append(l)
-			fp.seek(0)
-			fp.write("".join(lines))
-			fp.truncate()
 	f = 'Makefile.files'
 	dest_f = os.path.join(dest, f)
-	file_update(dest_f, os.path.join(src, f),
-		only_create=True)
-	mkfs_replace(dest_f)
+	if file_update(dest_f, os.path.join(src, f),
+		only_create=True):
+		update_make_files(dest_f)
+
+def update_make_files(path, up=None):
+	""" Updates DOC variable inside Makefile.files """
+	with open(path, 'r+') as fp:
+		files, before, after = read_make_files_all(fp, "DOC=")
+		if up is None:
+			files = []
+		else:
+			files = up(files)
+		fp.seek(0)
+		fp.write("".join(before))
+		fp.write("DOC=")
+		fp.write(" \\\n\t".join(files))
+		fp.write("\n")
+		fp.write("".join(after))
+		fp.truncate()
 
 def read_make_files(filename, prefix):
 	""" Reads files from a Makefile file which are entered as dependencies """
-	reading = False
-	files = []
 	with open(filename, 'r') as fp:
-		for line in fp:
-			if reading:
-				pass
-			elif line.startswith(prefix):
-				line = line[len(prefix):]
-				reading = True
+		return read_make_files_all(fp, prefix)[0]
+
+def read_make_files_all(fp, prefix):
+	"""
+	Reads files from a Makefile file prefixed by a variable name.
+	Returns a tuple with: (files, lines_before, lines_after)
+	"""
+	reading = 0
+	lines_before = []
+	lines_after = []
+	files = []
+	for line in fp:
+		if reading == 1:
+			pass
+		elif line.startswith(prefix):
+			line = line[len(prefix):]
+			reading = 1
+		else:
+			if reading == 0:
+				lines_before.append(line)
 			else:
-				continue
-			line = line.rstrip()
-			cont = False
-			if line[-1:] == "\\":
-				cont = True
-				line = line.rstrip("\\")
-			fn = ''
-			for e in line.split():
-				fn += e
-				if fn[-1:] == "\\":
-					fn = fn[:len(fn) - 1] + ' '
-				else:
-					files.append(fn)
-					fn = ''
-			if not cont: break
-	return files
+				lines_after.append(line)
+			continue
+		line = line.rstrip()
+		cont = False
+		if line[-1:] == "\\":
+			cont = True
+			line = line.rstrip("\\")
+		fn = ''
+		for e in line.split():
+			fn += e
+			if fn[-1:] == "\\":
+				fn = fn[:len(fn) - 1] + ' '
+			else:
+				files.append(fn)
+				fn = ''
+		if not cont:
+			reading = 2
+	return (files, lines_before, lines_after)
 
 def list_templates(directory):
 	""" Lists template files declared in Makefile.files """
@@ -181,16 +196,20 @@ def update_template(name, dest, src, deps=None):
 	file_update(f_dest, f_src)
 	if deps is None:
 		deps = confirm("Copy dependencies?", default=True)
-	if not deps: return
-	# Make depend
-	print('> make depend (cwd: %s)' % src)
-	subprocess.check_call(['make', 'depend'], cwd=src)
-	print('')
-	# Update dependencies
-	for d in read_make_files(os.path.join(src, 'Makefile.d'),
-		name.replace('.tex', '.pdf') + ':'):
-		if d == name: continue
-		file_update(os.path.join(dest, d), os.path.join(src, d))
+	if deps:
+		# Make depend
+		print('> make depend (cwd: %s)' % src)
+		subprocess.check_call(['make', 'depend'], cwd=src)
+		print('')
+		# Update dependencies
+		for d in read_make_files(os.path.join(src, 'Makefile.d'),
+			name.replace('.tex', '.pdf') + ':'):
+			if d == name: continue
+			file_update(os.path.join(dest, d), os.path.join(src, d))
+	# Add to Makefile.files
+	if confirm("Update Makefile.files?", default=True):
+		update_make_files(os.path.join(dest, 'Makefile.files'),
+			lambda l : sorted(l + [name]))
 
 # ------------------------------------------------------------------------------
 
