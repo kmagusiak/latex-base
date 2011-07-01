@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Script for merging latex-base directories
 
+import hashlib
 import os
 import os.path
 import shutil
@@ -56,6 +57,11 @@ def get_base_directory():
 	""" Gets the root directory where the files are located (BASE) """
 	return multi_call(2, os.path.dirname, sys.argv[0])
 
+def hash_file(path):
+	""" Returns a hash of a file. """
+	with open(path, 'rb') as fp:
+		hashlib.md5(fp.read()).hexdigest()
+
 # ------------------------------------------------------------------------------
 
 class AbortException(Exception):
@@ -86,7 +92,9 @@ def file_update(dest, src, only_create=False):
 	if not os.path.exists(src):
 		raise AbortException('Source does not exist: %s' % src)
 	if os.path.exists(dest):
-		if only_create or os.path.getmtime(dest) >= os.path.getmtime(src):
+		if (only_create
+			or os.path.getmtime(dest) >= os.path.getmtime(src)
+			or hash_file(dest) == hash_file(src)):
 			return False
 		print("File already exists: %s" % dest)
 		if confirm("Show diff?", default=False):
