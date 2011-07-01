@@ -110,6 +110,19 @@ def file_update(dest, src, only_create=False):
 	shutil.copyfile(src, dest)
 	return True
 
+def check_latex_base_directory(path, brep=False):
+	""" Checks if path points to a latex-base directory. """
+	if not os.path.isdir(path):
+		if brep: return False
+		raise AbortException("'%s' is not a directory!" % path)
+	if not os.path.exists(os.path.join(path, 'Makefile.files')):
+		if brep: return False
+		if not confirm(
+			"'%s' does not seems to be a latex-base directory, continue?"
+			% path):
+			raise AbortException()
+	if brep: return True
+
 def update_files(dest, src):
 	""" Updates the files by copying what is necessary """
 	# Create directories
@@ -231,12 +244,7 @@ def command_init(path, base=get_base_directory()):
 
 def command_update(base=get_base_directory()):
 	path = os.getcwd()
-	if not os.path.isdir(path):
-		raise AbortException("'%s' is not a directory!" % path)
-	if (not os.path.exists(os.path.join(path, 'Makefile.files'))
-		and not confirm(
-		"'%s' does not seems to be a latex-base directory, continue?" % path)):
-		raise AbortException()
+	check_latex_base_directory(path)
 	update_files(path, base)
 	print('Done.')
 
@@ -259,6 +267,7 @@ def command_template(name='', base=get_base_directory()):
 		raise AbortException("Template '%s' does not exist." % name)
 	# Copy
 	cwd = os.getcwd()
+	check_latex_base_directory(cwd)
 	update_template(name, cwd, base)
 	print('Done.')
 
