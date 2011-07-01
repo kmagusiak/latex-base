@@ -116,7 +116,7 @@ def update_files(dest, src):
 	for dirname in ['img']:
 		dir_update(os.path.join(dest, dirname))
 	# Update directories
-	for nextdir in ['input', 'script']:
+	for nextdir in ['input', 'script', 'style']:
 		dir_update(os.path.join(dest, nextdir), os.path.join(src, nextdir))
 	# Update files
 	for f in ['Makefile']:

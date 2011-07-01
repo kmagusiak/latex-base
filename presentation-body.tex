@@ -1,23 +1,5 @@
 %% Presentation body
 
-%% Title page
-\author[\docshortauthor]{\docauthor}
-\title[\docshorttitle]{\sc\doctitle}
-\ifthenelse{\equal{\docsubtitle}{}}{}{
-\subtitle{\docsubtitle}
-}
-\subject{\docsubject}
-\date{\docdate}
-\ifthenelse{\equal{\docorganization}{}}{}{
-\institute[\docshortorganization]{\docorganization}
-}
-\ifthenelse{\equal{\doclogo}{}}{
-%\logo{default-logo}
-}{
-\logo{\includeimagebase[keepaspectratio=true,
-	width=0.3\textwidth,height=0.3\textheight]{\doclogo}}
-}
-
 %% Bibliography
 \bibliography{biblio}
 
