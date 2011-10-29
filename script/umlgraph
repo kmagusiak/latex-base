@@ -1,0 +1,23 @@
+#!/bin/sh
+# UMLGraph starting
+
+# Check if there are arguments
+if [ $# == 0 ]
+then
+	echo "Usage: $0 [options] files" >&2
+	echo "   see: http://www.umlgraph.org/doc.html" >&2
+	exit 1
+fi
+
+# Invocation
+UMLGRAPH_HOME="$(dirname $0)"
+run_umlgraph_normal() {
+	java -classpath "$UMLGRAPH_HOME/UmlGraph.jar:$JAVA_HOME/lib/tools.jar" \
+		org.umlgraph.doclet.UmlGraph $@
+}
+run_umlgraph() {
+	run_umlgraph_normal -output - $@
+}
+
+# Run
+[ "$(basename $0)" == "umlgraph" ] && run_umlgraph $@

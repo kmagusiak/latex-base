@@ -23,6 +23,7 @@ Optional dependencies:
 - gnuplot
 - graphviz
 - inkscape or imagemagick
+- umlgraph (included)
 
 `make` described below may be used on the project to check if minimal
 dependencies are met.
