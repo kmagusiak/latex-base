@@ -8,7 +8,8 @@ all: compile_clean
 # Files #
 #########
 
-INTERN_MAKE_DEPGEN=script/latex-depgen.py
+SCRIPT_DIR=script
+INTERN_MAKE_DEPGEN=$(SCRIPT_DIR)/latex-depgen.py
 INTERN_MAKE_FILES=Makefile.files
 INTERN_MAKE_DEPS=Makefile.d
 
@@ -49,7 +50,8 @@ PYTHON=python
 RM=rm -f
 SHELL=/bin/bash
 UMLGRAPH_ARG=-private
-UMLGRAPH_JAR=script/UmlGraph.jar
+UMLGRAPH_HOME=$(SCRIPT_DIR)
+UMLGRAPH_JAR=$(UMLGRAPH_HOME)/UmlGraph.jar
 VERBOSE=no
 VIEWER=evince
 
@@ -130,6 +132,7 @@ help:
 	@echo "eps -> pdf (using epspdf)"
 	@echo "java -> dot (using UmlGraph)"
 	@echo "pdf -> png (using imagemagick)"
+	@echo "pic -> svg (using plotutils)"
 	@echo "sh -> png (execute with extension argument and pipe the output)"
 	@echo "svg -> {eps,pdf,png} (using inkscape or imagemagick)"
 	@echo "tex -> pdf (using pdflatex)"
@@ -226,6 +229,11 @@ images: $(IMG_ALL)
 	@$(MSG_BEGIN) Generating $@ from pdf $(MSG_END)
 	convert -density 600x600 $< $@
 
+%.svg: %.pic
+	@$(MSG_BEGIN) Generating $@ from pic $(MSG_END)
+	( cd $(SCRIPT_DIR) && pic2plot -T$(subst .,,$(suffix $@)) \
+		"$(abspath $<)" > "$(abspath $@)" )
+
 .sh.png:
 	@$(MSG_BEGIN) Generating $@ from sh $(MSG_END)
 	( cd $(dir $<) && ./$(notdir $<) png > $(notdir $@) )
@@ -274,7 +282,7 @@ list:
 	@echo "# Generated images"
 	@$(foreach f, $(IMG_GENERATED), echo "$f";)
 	@echo "# Static images"
-	@$(foreach f, $(IMG_STATIC), echo "$f";) 
+	@$(foreach f, $(IMG_STATIC), echo "$f";)
 
 export: compile
 ifeq (x,x$(EXPORT_DIR))
@@ -294,4 +302,6 @@ FORCE: ; @true
 	images images-clean images-distclean \
 	latex latex-clean latex-distclean \
 	list
-.SUFFIXES: .aux .bib .bbl .dia .dot .eps .idx .ind .java .pdf .png .svg .tex
+.SUFFIXES: .aux .bib .bbl .dia .dot \
+	.eps .idx .ind .java \
+	.pdf .pic .png .svg .tex
