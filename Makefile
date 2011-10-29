@@ -8,7 +8,19 @@ all: compile_clean
 # Files #
 #########
 
+# Variables and commands
+GRAPHVIZ_DOT=dot
+PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
+PYTHON=python
+RM=rm -f
 SCRIPT_DIR=script
+SHELL=/bin/sh
+UMLGRAPH_ARG=-private
+UMLGRAPH_HOME=$(SCRIPT_DIR)
+UMLGRAPH_JAR=$(UMLGRAPH_HOME)/UmlGraph.jar
+VERBOSE=no
+VIEWER=evince
+
 INTERN_MAKE_DEPGEN=$(SCRIPT_DIR)/latex-depgen.py
 INTERN_MAKE_FILES=Makefile.files
 INTERN_MAKE_DEPS=Makefile.d
@@ -44,18 +56,6 @@ endif
 ############
 # Commands #
 ############
-
-# Variables and commands
-GRAPHVIZ_DOT=dot
-PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
-PYTHON=python
-RM=rm -f
-SHELL=/bin/bash
-UMLGRAPH_ARG=-private
-UMLGRAPH_HOME=$(SCRIPT_DIR)
-UMLGRAPH_JAR=$(UMLGRAPH_HOME)/UmlGraph.jar
-VERBOSE=no
-VIEWER=evince
 
 # Removes a file and echoes its name if the file existed
 define rm-echo # $1: filename

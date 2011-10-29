@@ -18,3 +18,13 @@ DOC=document.tex \
 ## Dependencies (automatically built)
 DOC_AUTODEP=$(DOC)
 
+## Environment variables
+#GRAPHVIZ_DOT=dot
+#PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
+#PYTHON=python
+#UMLGRAPH_ARG=-private
+#UMLGRAPH_HOME=$(SCRIPT_DIR)
+#UMLGRAPH_JAR=$(UMLGRAPH_HOME)/UmlGraph.jar
+#VERBOSE=no
+#VIEWER=evince
+
