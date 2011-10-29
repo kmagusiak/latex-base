@@ -24,11 +24,11 @@ IMG_ROOT_DIR=img
 IMG_STATIC_EXTENSIONS=eps jpg pdf png
 IMG_FOUND=$(sort $(foreach ext, $(IMG_STATIC_EXTENSIONS), \
 	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
-IMG_SRC_EXTENSIONS=dia dot java sh svg tex
+IMG_SRC_EXTENSIONS=dia dot java pic plant sh svg tex
 IMG_SRC=$(sort $(foreach ext, $(IMG_SRC_EXTENSIONS), \
 	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
 IMG_GENERATED=$(sort \
-	$(filter %.pdf, $(foreach ext, dia dot java svg tex, \
+	$(filter %.pdf, $(foreach ext, dia dot java pic plant svg tex, \
 	$(patsubst %.$(ext),%.pdf, $(IMG_SRC)))) \
 	$(filter %.png, $(foreach ext, sh, \
 	$(patsubst %.$(ext),%.png, $(IMG_SRC)))) \
@@ -46,6 +46,8 @@ endif
 ############
 
 # Variables and commands
+GRAPHVIZ_DOT=dot
+PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 PYTHON=python
 RM=rm -f
 SHELL=/bin/bash
@@ -133,6 +135,7 @@ help:
 	@echo "java -> dot (using UmlGraph)"
 	@echo "pdf -> png (using imagemagick)"
 	@echo "pic -> svg (using plotutils)"
+	@echo "plant -> {png,svg} (using plantuml)"
 	@echo "sh -> png (execute with extension argument and pipe the output)"
 	@echo "svg -> {eps,pdf,png} (using inkscape or imagemagick)"
 	@echo "tex -> pdf (using pdflatex)"
@@ -212,7 +215,7 @@ images: $(IMG_ALL)
 
 %.eps %.pdf %.png: %.dot
 	@$(MSG_BEGIN) Generating $@ from dot $(MSG_END)
-	( cd $(dir $<) && dot -T$(subst .,,$(suffix $@)) \
+	( cd $(dir $<) && $(GRAPHVIZ_DOT) -T$(subst .,,$(suffix $@)) \
 		-o $(notdir $@) $(notdir $<) )
 
 .eps.pdf:
@@ -228,6 +231,11 @@ images: $(IMG_ALL)
 .pdf.png:
 	@$(MSG_BEGIN) Generating $@ from pdf $(MSG_END)
 	convert -density 600x600 $< $@
+
+%.png %.svg %.txt: %.plant
+	@$(MSG_BEGIN) Generating $@ from plant $(MSG_END)
+	cat "$<" | java -jar $(PLANTUML_JAR) \
+		-t$(subst .,,$(suffix $@)) -pipe > "$@"
 
 %.svg: %.pic
 	@$(MSG_BEGIN) Generating $@ from pic $(MSG_END)
@@ -304,4 +312,4 @@ FORCE: ; @true
 	list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
 	.eps .idx .ind .java \
-	.pdf .pic .png .svg .tex
+	.pdf .plan .pic .png .svg .tex
