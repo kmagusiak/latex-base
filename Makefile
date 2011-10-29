@@ -9,6 +9,7 @@ all: compile_clean
 #########
 
 # Variables and commands
+DIA=dia
 GRAPHVIZ_DOT=dot
 PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 PYTHON=python
@@ -20,6 +21,15 @@ UMLGRAPH_HOME=$(SCRIPT_DIR)
 UMLGRAPH_JAR=$(UMLGRAPH_HOME)/UmlGraph.jar
 VERBOSE=no
 VIEWER=evince
+
+# For Java
+ifeq (x,x$(JAVA_HOME))
+	JAVA=java
+	JAVADOC=javadoc
+else
+	JAVA=$(JAVA_HOME)/bin/java
+	JAVADOC=$(JAVA_HOME)/bin/javadoc
+endif
 
 INTERN_MAKE_DEPGEN=$(SCRIPT_DIR)/latex-depgen.py
 INTERN_MAKE_FILES=Makefile.files
@@ -144,6 +154,9 @@ help:
 	@echo "VERBOSE: when set, latex command prints the output"
 	@echo "VIEWER: the viewer for PDF files"
 
+debug-%:
+	@echo "$*=$($*)"
+
 depend:
 	$(RM) $(INTERN_MAKE_DEPS)
 	$(MAKE) FORCE
@@ -211,7 +224,7 @@ images: $(IMG_ALL)
 
 %.eps %.pdf %.png: %.dia
 	@$(MSG_BEGIN) Generating $@ from dia $(MSG_END)
-	( cd $(dir $<) && dia --export=$(notdir $@) $(notdir $<) )
+	( cd $(dir $<) && $(DIA) --export=$(notdir $@) $(notdir $<) )
 
 %.eps %.pdf %.png: %.dot
 	@$(MSG_BEGIN) Generating $@ from dot $(MSG_END)
@@ -224,7 +237,7 @@ images: $(IMG_ALL)
 
 .java.dot:
 	@$(MSG_BEGIN) Generating $@ from java $(MSG_END)
-	javadoc -docletpath "$(UMLGRAPH_JAR)" \
+	$(JAVADOC) -docletpath "$(UMLGRAPH_JAR)" \
 		-doclet org.umlgraph.doclet.UmlGraph \
 		-output "$@" $(UMLGRAPH_ARG) "$<"
 
@@ -234,7 +247,7 @@ images: $(IMG_ALL)
 
 %.png %.svg %.txt: %.plant
 	@$(MSG_BEGIN) Generating $@ from plant $(MSG_END)
-	cat "$<" | java -jar $(PLANTUML_JAR) \
+	cat "$<" | $(JAVA) -jar $(PLANTUML_JAR) \
 		-t$(subst .,,$(suffix $@)) -pipe > "$@"
 
 %.svg: %.pic
@@ -312,4 +325,4 @@ FORCE: ; @true
 	list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
 	.eps .idx .ind .java \
-	.pdf .plan .pic .png .svg .tex
+	.pdf .plant .pic .png .svg .tex
