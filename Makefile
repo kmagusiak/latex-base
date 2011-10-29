@@ -23,11 +23,11 @@ IMG_ROOT_DIR=img
 IMG_STATIC_EXTENSIONS=eps jpg pdf png
 IMG_FOUND=$(sort $(foreach ext, $(IMG_STATIC_EXTENSIONS), \
 	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
-IMG_SRC_EXTENSIONS=dia dot sh svg tex
+IMG_SRC_EXTENSIONS=dia dot java sh svg tex
 IMG_SRC=$(sort $(foreach ext, $(IMG_SRC_EXTENSIONS), \
 	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
 IMG_GENERATED=$(sort \
-	$(filter %.pdf, $(foreach ext, dia dot svg tex, \
+	$(filter %.pdf, $(foreach ext, dia dot java svg tex, \
 	$(patsubst %.$(ext),%.pdf, $(IMG_SRC)))) \
 	$(filter %.png, $(foreach ext, sh, \
 	$(patsubst %.$(ext),%.png, $(IMG_SRC)))) \
@@ -44,9 +44,14 @@ endif
 # Commands #
 ############
 
-SHELL=/bin/sh
+# Variables and commands
 PYTHON=python
 RM=rm -f
+SHELL=/bin/bash
+UMLGRAPH_ARG=-private
+UMLGRAPH_JAR=script/UmlGraph.jar
+VERBOSE=no
+VIEWER=evince
 
 # Removes a file and echoes its name if the file existed
 define rm-echo # $1: filename
@@ -80,7 +85,6 @@ pdf-makeindex=makeindex $(1) $(PDF_LATEX_REDIRECT)
 pdf-viewer=$(VIEWER) $(1) $(PDF_LATEX_REDIRECT)
 
 ## Environment options
-VERBOSE=no
 PDF_LATEX_COMMON_FLAGS=--shell-escape
 ifneq (xno,x$(VERBOSE))
 	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS)
@@ -90,7 +94,6 @@ else
 	PDF_LATEX_REDIRECT=&> /dev/null < /dev/null
 endif
 RECOMPILE=yes
-VIEWER=evince
 
 ## Colors
 COLOR_MSG=0;36m
@@ -125,7 +128,9 @@ help:
 	@echo "dia -> {eps,pdf,png} (using dia)"
 	@echo "dot -> {eps,pdf,png} (using graphviz)"
 	@echo "eps -> pdf (using epspdf)"
+	@echo "java -> dot (using UmlGraph)"
 	@echo "pdf -> png (using imagemagick)"
+	@echo "sh -> png (execute with extension argument and pipe the output)"
 	@echo "svg -> {eps,pdf,png} (using inkscape or imagemagick)"
 	@echo "tex -> pdf (using pdflatex)"
 	@$(MSG_BEGIN) Environment variables $(MSG_END)
@@ -211,6 +216,12 @@ images: $(IMG_ALL)
 	@$(MSG_BEGIN) Generating $@ from pdf $< $(MSG_END)
 	epspdf $< $@
 
+.java.dot:
+	@$(MSG_BEGIN) Generating $@ from java $(MSG_END)
+	javadoc -docletpath "$(UMLGRAPH_JAR)" \
+		-doclet org.umlgraph.doclet.UmlGraph \
+		-output "$@" $(UMLGRAPH_ARG) "$<"
+
 .pdf.png:
 	@$(MSG_BEGIN) Generating $@ from pdf $(MSG_END)
 	convert -density 600x600 $< $@
@@ -283,4 +294,4 @@ FORCE: ; @true
 	images images-clean images-distclean \
 	latex latex-clean latex-distclean \
 	list
-.SUFFIXES: .aux .bib .bbl .dia .dot .eps .idx .ind .pdf .png .svg .tex
+.SUFFIXES: .aux .bib .bbl .dia .dot .eps .idx .ind .java .pdf .png .svg .tex
