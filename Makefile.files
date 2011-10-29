@@ -19,6 +19,7 @@ DOC=document.tex \
 DOC_AUTODEP=$(DOC)
 
 ## Environment variables
+#DIA=dia
 #GRAPHVIZ_DOT=dot
 #PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 #PYTHON=python
