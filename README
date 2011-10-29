@@ -23,6 +23,7 @@ Optional dependencies:
 - gnuplot
 - graphviz
 - inkscape or imagemagick
+- plantuml
 - plotutils
 - umlgraph (included)
 
