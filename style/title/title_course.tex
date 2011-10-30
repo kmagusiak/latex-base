@@ -6,7 +6,7 @@
 % \def\titlepageAssistants{comma separated list of assistant names}
 
 \def\titlepageBottom{%
-\begin{tabular}{rp{6cm}}
+\begin{tabular}{>{\raggedleft}p{0.3\linewidth}p{0.3\linewidth}}
 \ifthenelse{\isundefined{\titlepageCourse}}{}{
 \coursename: & \mbox{\titlepageCourse} \\
 }
