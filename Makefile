@@ -99,7 +99,7 @@ pdf-makeindex=makeindex $(1) $(PDF_LATEX_REDIRECT)
 pdf-viewer=$(VIEWER) $(1) $(PDF_LATEX_REDIRECT)
 
 ## Environment options
-PDF_LATEX_COMMON_FLAGS=--shell-escape
+PDF_LATEX_COMMON_FLAGS=-shell-escape
 ifneq (xno,x$(VERBOSE))
 	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS)
 	PDF_LATEX_REDIRECT=

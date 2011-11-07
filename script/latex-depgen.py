@@ -63,7 +63,8 @@ def getTexFileDep(filename, dep = None):
 				ext = IMG_EXT_NORMAL, extdef = IMG_EXT_DEF)
 			# includeimage | includeimagefigure
 			getTexFileDepMatch(dep, line,
-				'\\\\includeimage(?:base|figure)?' + match_opt_arg,
+				'\\\\includeimage(?:base|figure)?'
+				+ '(?:' + match_opt + ')*' + match_arg,
 				ext = IMG_EXT_NORMAL, extdef = IMG_EXT_DEF,
 				dir = IMG_ROOT_DIR)
 			# pgfdeclareimage
