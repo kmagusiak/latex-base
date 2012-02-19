@@ -2,9 +2,6 @@
 ## Makefile (LaTeX) files ##
 ############################
 
-PROJECT_NAME=latex-base
-EXPORT_DIR=$(PROJECT_NAME)
-
 ## Document list (tex files)
 DOC=document.tex \
 	letter.tex \
@@ -20,6 +17,7 @@ DOC_AUTODEP=$(DOC)
 
 ## Environment variables
 #DIA=dia
+#EXPORT_DIR=export
 #GRAPHVIZ_DOT=dot
 #PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 #PYTHON=python
