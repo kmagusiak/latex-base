@@ -58,11 +58,6 @@ IMG_GENERATED=$(sort \
 IMG_ALL=$(sort $(IMG_FOUND) $(IMG_GENERATED))
 IMG_STATIC=$(filter-out $(IMG_GENERATED), $(IMG_ALL))
 
-## Project properties
-ifeq (x,x$(PROJECT_NAME))
-$(error PROJECT_NAME is not defined!)
-endif
-
 ############
 # Commands #
 ############
