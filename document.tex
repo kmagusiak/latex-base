@@ -31,6 +31,7 @@
 %% Bibliography and indexes
 \bibliography{biblio}
 \makeindex
+\makeglossaries
 
 %%%%%%%%%%%%
 % Document %
@@ -45,7 +46,6 @@
 %%%%%%%%%%%%%
 % Body text %
 %%%%%%%%%%%%%
-
 \input{document-example}
 
 \vspace*{\fill}
@@ -57,16 +57,22 @@
 %% Bibliography, indexes and lists
 %\listoffigures
 %\listoftables
+%\vspace*{\fill}
+
+%\glsaddall % include all glossary entries
+\printglossaries
+\vspace*{\fill}
+
 %\nocite{*} % include all citations
 \printbibliography
-\printindex
 \vspace*{\fill}
+
+\printindex
 
 %%%%%%%%%%%%
 % Appendix %
 %%%%%%%%%%%%
 \appendix
-
 %\input{appendix}
 
 \end{document}

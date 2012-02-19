@@ -83,13 +83,15 @@ define pdf-latex # $1: tex file
 endef
 # LaTeX recompile rule
 define pdf-latex-recompile # $1: tex file
-	grep -E '(There were undefined references|rerun to get)' \
+	grep -i -E '(There were undefined references|rerun to get)' \
 		"$*.log" &> /dev/null
 endef
 # Makes the bibliography file ($1: bib file)
 pdf-bibtex=bibtex $(1:.bib=) $(PDF_LATEX_REDIRECT)
 # Makes the index file ($1: idx file)
 pdf-makeindex=makeindex $(1) $(PDF_LATEX_REDIRECT)
+# Makes the glossaries ($1: without extension)
+pdf-makeglossaries=makeglossaries $(1) $(PDF_LATEX_REDIRECT)
 # Opens a pdf file ($1: pdf file)
 pdf-viewer=$(VIEWER) $(1) $(PDF_LATEX_REDIRECT)
 
@@ -179,13 +181,18 @@ latex: $(DOCUMENTS)
 	test ! -f "$*.aux" \
 		|| ! grep -E '\\(cit|bib)' "$*.aux" &> /dev/null \
 		|| ($(MAKE) "$*.bbl"; echo "rerun to get the bibliography" >> "$*.log")
-	test ! -f "$*.idx" \
+	test ! -s "$*.idx" \
 		|| ($(MAKE) "$*.ind"; echo "rerun to get the index" >> "$*.log")
+	!( test -s "$*.glo" || test -s "$*.acn" ) \
+		|| ($(MAKE) "$*.glg"; echo "rerun to get the glossaries" >> "$*.log")
 ifeq (x$(RECOMPILE),xyes)
-	! ($(call pdf-latex-recompile,$<)) || ( \
-	$(MSG_BEGIN) LaTeX recompile: $* $(MSG_END);\
-	$(call pdf-latex,$<); \
-	$(call pdf-latex,$<); \
+	!($(call pdf-latex-recompile,$<)) || ( \
+	   $(MSG_BEGIN) LaTeX recompile: $* $(MSG_END); \
+	   $(call pdf-latex,$<); \
+   	   !($(call pdf-latex-recompile,$<)) || ( \
+	   	   $(MSG_BEGIN) LaTeX recompile: $* $(MSG_END); \
+	   	   $(call pdf-latex,$<); \
+   	   ) \
 	)
 endif
 
@@ -197,11 +204,16 @@ endif
 	@$(MSG_BEGIN) makeindex: $* $(MSG_END)
 	$(call pdf-makeindex,$<)
 
+%.glg: %.aux %.glo
+	@$(MSG_BEGIN) makeglossaries: $* $(MSG_END)
+	$(call pdf-makeglossaries,$*)
+
 %.tex.clean:
 	$(RM) \
-		$*.aux $*.bbl $*.blg $*.fax $*.glg $*.glo $*.gls $*.idx \
-		$*.ilg $*.ind $*.ist $*.lof $*.log $*.loh $*.loi $*.lot \
-		$*.nav $*.out $*.snm $*.tns $*.toc $*.vrb \
+		$*.acn $*.acr $*.alg $*.aux $*.bbl $*.blg $*.fax $*.glg \
+		$*.glo $*.gls $*.idx $*.ilg $*.ind $*.ist $*.lof $*.log \
+		$*.loh $*.loi $*.lot $*.nav $*.out $*.snm $*.tns $*.toc \
+		$*.vrb \
 		$*.*.gnuplot $*.*.table \
 		$*.run.xml $*-blx.bib
 
@@ -319,5 +331,5 @@ FORCE: ; @true
 	latex latex-clean latex-distclean \
 	list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
-	.eps .idx .ind .java \
+	.eps .glo .glg .idx .ind .java \
 	.pdf .plant .pic .png .svg .tex

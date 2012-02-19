@@ -508,13 +508,15 @@ here is a brief list of them:
 \label{alg:example}
 \end{algorithm}
 
-\section{Bibliography}
+\section{Special pages}
+
+\subsection{Bibliography}
 
 Getting the bibliography at the end of the document usually isn't an easy nor
 fascinating task to do.
 Hopefully, \LaTeX{} has a very good support for it using \texttt{bibtex} and
-optionally a package named
-\texttt{biblatex}\footnote{\url{http://ctan.org/tex-archive/macros/latex/exptl/biblatex/doc/biblatex.pdf}}.
+optionally a package named \texttt{biblatex}%
+\footnote{\url{http://ctan.org/tex-archive/macros/latex/exptl/biblatex/doc/biblatex.pdf}}.
 
 Your bibliography is declared in a separate file with an extension
 \texttt{.bib}, it is parsed and \emph{cited} references are automatically added
@@ -528,3 +530,39 @@ There is also an alternative version: \lstinline!\nocite{name}!;
 it will not print anything but the reference will still appear at the end of the
 document.
 A special name \texttt{*} can be used to cite everything.
+
+\subsection{Indexing}
+
+An index will be built for every \lstinline!\index{entry}! in the document.
+These are automatically sorted and printed at the end of the document.
+
+An \texttt{entry} is often a single word.
+It can also be \texttt{group!word} which will print the word inside a group.
+Formatting can be done in two ways:
+\begin{itemize}
+\item \texttt{word@shown} indexes \texttt{word} but prints {shown}
+\item \texttt{word|textit} applies a formatting to the word
+\item \texttt{word|see{other}} prints a \emph{see} \texttt{other}
+\item \texttt{word|seealso{other}} prints a \emph{seealso} \texttt{other}
+\end{itemize}
+
+\subsection{Glossaries and acronyms}
+
+Glossaries are added at the end of the document.
+Entries can be easily defined using \lstinline!\newglossaryentry! and similarly
+acronyms can be defined using \lstinline!\newacronym!.
+Below, you will find some examples.
+
+\begin{lstlisting}
+\newglossaryentry{linux}{
+   name={Linux},
+   description={Free OS},
+   plural={Linuces}
+}
+\newacronym{lvm}{LVM}{Logical Volume Manager}
+\newacronym{gnu}{GNU}{GNU is not Unix}
+\end{lstlisting}
+
+You can include them using \lstinline!\gls{a}, \Gls{a}, \glspl{a}!.
+The first version includes the name of the entry, the second capitalizes the
+first letter of the word and the third includes the plural form.
