@@ -8,16 +8,6 @@ import shutil
 import subprocess
 import sys
 
-def multi_call(n, f, arg):
-	"""
-	Calls a function several times and returns f(f(...f(arg))) where f is
-	applied n times.
-	"""
-	while n > 0:
-		arg = f(arg)
-		n -= 1
-	return arg
-
 def prompt(message='Input:', choice=None, default=None):
 	""" Prompts a user to enter some text."""
 	while True:
@@ -55,7 +45,10 @@ def confirm(message='Confirm?', default=None):
 
 def get_base_directory():
 	""" Gets the root directory where the files are located (BASE) """
-	return multi_call(2, os.path.dirname, sys.argv[0])
+	d = os.path.dirname(sys.argv[0])
+	d = os.path.join(d, '..')
+	d = os.path.normpath(d)
+	return d
 
 def hash_file(path):
 	""" Returns a hash of a file. """
@@ -112,24 +105,27 @@ def file_update(dest, src, only_create=False):
 
 def check_latex_base_directory(path, brep=False):
 	""" Checks if path points to a latex-base directory. """
+	if path == '':
+		path = './'
 	if not os.path.isdir(path):
 		if brep: return False
 		raise AbortException("'%s' is not a directory!" % path)
 	if not os.path.exists(os.path.join(path, 'Makefile.files')):
 		if brep: return False
 		if not confirm(
-			"'%s' does not seems to be a latex-base directory, continue?"
+			"'%s' does not seem to be a latex-base directory, continue?"
 			% path):
 			raise AbortException()
 	if brep: return True
 
 def update_files(dest, src):
 	""" Updates the files by copying what is necessary """
+	check_latex_base_directory(src)
 	# Create directories
 	for dirname in ['img']:
 		dir_update(os.path.join(dest, dirname))
 	# Update directories
-	for nextdir in ['input', 'script', 'style']:
+	for nextdir in ['input', 'script']:
 		dir_update(os.path.join(dest, nextdir), os.path.join(src, nextdir))
 	# Update files
 	for f in ['Makefile']:
@@ -281,6 +277,8 @@ if __name__ == '__main__':
 		print(' init: creates a new repository PATH from BASE')
 		print(' update: updates files in the current folder from BASE')
 		print(' template: copies a template file')
+		print('')
+		print(' BASE=' + get_base_directory())
 	if len(sys.argv) < 2:
 		usage()
 		sys.exit(1)

@@ -131,11 +131,17 @@ def stripLatexLine(line, old_line = ''):
 		i = line.find('%', i + 1)
 	return (old_line + line.strip(), unfinished)
 
+def writeDep(out, dep):
+	"""Writes a dependency file"""
+	if ' ' in dep:
+		sys.stderr.write("File '%s' contains invalid characters\n" % dep)
+	out.write(dep)
+
 def writeDeps(out, deps, suffix = ''):
 	"""Writes the list of dependencies."""
 	for d in sorted(deps):
 		out.write(' \\\n\t')
-		out.write(d)
+		writeDep(out, d)
 	out.write(suffix)
 
 def writeDependencies(out, file, deps, outext = 'pdf'):
@@ -143,7 +149,9 @@ def writeDependencies(out, file, deps, outext = 'pdf'):
 	genfile = file.replace('.tex', '.' + outext)
 	if genfile == file: return
 	out.write("# Generated for %s\n" % file)
-	out.write(genfile + ': ' + file)
+	writeDep(out, genfile)
+	out.write(': ')
+	writeDep(out, file)
 	writeDeps(out, deps, suffix = "\n\n")
 
 if __name__ == '__main__':
