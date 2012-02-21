@@ -96,13 +96,14 @@ pdf-makeglossaries=makeglossaries $(1) $(PDF_LATEX_REDIRECT)
 pdf-viewer=$(VIEWER) $(1) $(PDF_LATEX_REDIRECT)
 
 ## Environment options
+NULL_OUTPUT=> /dev/null 2> /dev/null
 PDF_LATEX_COMMON_FLAGS=-shell-escape
 ifneq (xno,x$(VERBOSE))
 	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS)
 	PDF_LATEX_REDIRECT=
 else
-	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS) -interaction batch
-	PDF_LATEX_REDIRECT=&> /dev/null < /dev/null
+	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS) -interaction batchmode
+	PDF_LATEX_REDIRECT=$(NULL_OUTPUT) < /dev/null
 endif
 RECOMPILE=yes
 
@@ -178,8 +179,8 @@ latex: $(DOCUMENTS)
 .tex.pdf:
 	@$(MSG_BEGIN) LaTeX compile: $* $(MSG_END)
 	$(call pdf-latex,$<)
-	test ! -f "$*.aux" \
-		|| ! grep -E '\\(cit|bib)' "$*.aux" &> /dev/null \
+	test ! -s "$*.aux" \
+		|| ! grep -E '\\(cit|bib)' "$*.aux" $(NULL_OUTPUT) \
 		|| ($(MAKE) "$*.bbl"; echo "rerun to get the bibliography" >> "$*.log")
 	test ! -s "$*.idx" \
 		|| ($(MAKE) "$*.ind"; echo "rerun to get the index" >> "$*.log")
