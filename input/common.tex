@@ -10,7 +10,7 @@
 \usepackage{amsfonts, amsmath, amssymb, amsthm}
 \usepackage{eurosym}
 
-% Typeout
+%% Typeout; set: author, title and date
 \typeout{}
 \typeout{** DOCUMENT METADATA}
 \ifthenelse{\isundefined{\doclanguage}}{\def\doclanguage{}}{
@@ -18,16 +18,19 @@
 }
 \ifthenelse{\isundefined{\doctitle}}{\def\doctitle{}}{
 \typeout{Title: \doctitle}
+\title{\sc\doctitle}
 }
 \ifthenelse{\isundefined{\docsubtitle}}{\def\docsubtitle{}}{
 \typeout{Subtitle: \docsubtitle}
 }
 \ifthenelse{\isundefined{\docauthor}}{\def\docauthor{}}{
 \typeout{Author: \docauthor}
+\author{\docauthor}
 }
 \ifthenelse{\isundefined{\docdate}}{\def\docdate{\today}}{
 \typeout{Date: \docdate}
 }
+\date{\docdate}
 \ifthenelse{\isundefined{\docorganization}}{\def\docorganization{}}{
 \typeout{Organization: \docorganization}
 }
