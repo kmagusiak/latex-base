@@ -1,17 +1,20 @@
 %% document-begin
 %% (title page and toc)
 
+\ifthenelse{\isundefined{\doctitlepagename}}{}{
 \ifthenelse{\equal{\doctitlepagename}{}}{
 \maketitle
 }{
 \input{input/title/title_\doctitlepagename}
 }
+}
 
+\ifthenelse{\isundefined{\docabstract}}{}{
 \ifthenelse{\equal{\docabstract}{}}{}{
 \begin{abstract}
 \docabstract
 \end{abstract}
-}
+}}
 %\vspace{\fill}
 %\clearpage
 
@@ -25,14 +28,17 @@
 \rfoot[]{\ofname{\thepage{}}{\pageref{LastPage}}}
 
 %% TOC
+\ifthenelse{\isundefined{\doctocdepth}}{}{
 \ifthenelse{\equal{\doctocdepth}{}}{}{
 \setcounter{tocdepth}{\doctocdepth}
 \tableofcontents
-}
+}}
 
 %% Page jump
+\ifthenelse{\isundefined{\doctitlepagename}}{}{
 \ifthenelse{\equal{\doctitlepagename}{}}{
 \vspace{\fill}
 }{
 \clearpage
+}
 }
