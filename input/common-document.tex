@@ -6,21 +6,19 @@
 \usepackage[pdftex]{hyperref} % URLs and links
 \usepackage[pdftex]{graphicx} % Include graphics
 \usepackage{grffile} % File names fix (graphicsx '.' in names)
-\usepackage{tabularx} % Tables (extended)
-\usepackage{float} % Floats (extended)
-\usepackage{wrapfig} % Wrapping text around figures
 \usepackage[table]{xcolor} % Colors
-\usepackage{multirow} % Row spanning in tables
+\usepackage{float} % Floats (extended)
+\usepackage{tabularx} % Tables (extended)
 
-\usepackage{acronym} % For acronyms
 \usepackage{enumitem} % For enumerations
 \usepackage{fancyhdr} % Headers and footers
-\usepackage[acronym]{glossaries} % Glossaries
 \usepackage{lastpage} % \pageref{LastPage} % Must be compiled 2 times!
 \usepackage{makeidx} % Index
+\usepackage{multirow} % Row spanning in tables
 \usepackage{pdflscape} % Landscape
 \usepackage{rotating} % Rotated text
 \usepackage{setspace} % Changing the interline
+\usepackage{wrapfig} % Wrapping text around figures
 
 %% Bibliography
 \usepackage[natbib=false
@@ -43,6 +41,12 @@
 	}%
 }
 }{}
+
+%% Glossaries
+\usepackage[acronym
+	%,description
+	%,footnote
+	]{glossaries}
 
 %% Macros
 \input{input/macros}
