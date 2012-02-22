@@ -13,23 +13,28 @@
 % Typeout
 \typeout{}
 \typeout{** DOCUMENT METADATA}
+\ifthenelse{\isundefined{\doclanguage}}{\def\doclanguage{}}{
 \typeout{Language: \doclanguage}
+}
+\ifthenelse{\isundefined{\doctitle}}{\def\doctitle{}}{
 \typeout{Title: \doctitle}
+}
+\ifthenelse{\isundefined{\docsubtitle}}{\def\docsubtitle{}}{
+\typeout{Subtitle: \docsubtitle}
+}
+\ifthenelse{\isundefined{\docauthor}}{\def\docauthor{}}{
 \typeout{Author: \docauthor}
+}
+\ifthenelse{\isundefined{\docdate}}{\def\docdate{\today}}{
 \typeout{Date: \docdate}
-\ifthenelse{\isundefined{\docorganization}}{
-\def\docorganization{}
-}{
+}
+\ifthenelse{\isundefined{\docorganization}}{\def\docorganization{}}{
 \typeout{Organization: \docorganization}
 }
-\ifthenelse{\isundefined{\docsubject}}{
-\def\docsubject{}
-}{
+\ifthenelse{\isundefined{\docsubject}}{\def\docsubject{}}{
 \typeout{Subject: \docsubject}
 }
-\ifthenelse{\isundefined{\dockeywords}}{
-\def\dockeywords{}
-}{}
+\ifthenelse{\isundefined{\dockeywords}}{\def\dockeywords{}}{}
 \typeout{}
 
 %% Language

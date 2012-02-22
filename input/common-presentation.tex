@@ -15,6 +15,11 @@
 \input{input/macros}
 \renewcommand{\pcomment}[1]{\begin{scriptsize}(#1)\end{scriptsize}}
 
+%% Short versions
+\ifthenelse{\isundefined{\docshortauthor}}{\def\docshortauthor{}}{}
+\ifthenelse{\isundefined{\docshorttitle}}{\def\docshorttitle{}}{}
+\ifthenelse{\isundefined{\docshortorganization}}{\def\docshortorganization{}}{}
+
 %% Title page
 \author[\docshortauthor]{\docauthor}
 \title[\docshorttitle]{\sc\doctitle}
@@ -26,10 +31,11 @@
 \ifthenelse{\equal{\docorganization}{}}{}{
 \institute[\docshortorganization]{\docorganization}
 }
+\ifthenelse{\isundefined{\doctocdepth}}{}{
 \ifthenelse{\equal{\doclogo}{}}{}{
 \logo{\includeimagebase[keepaspectratio=true,
 	width=0.3\textwidth,height=0.3\textheight]{\doclogo}}
-}
+}}
 
 %% Beamer options
 \DeclareOptionBeamer{compress}{\beamer@compresstrue}
