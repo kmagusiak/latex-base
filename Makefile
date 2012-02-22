@@ -13,6 +13,7 @@ DIA=dia
 GRAPHVIZ_DOT=dot
 PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 PYTHON=python
+RECOMPILE=yes
 RM=rm -f
 SCRIPT_DIR=script
 SHELL=/bin/sh
@@ -79,21 +80,27 @@ endef
 define pdf-latex # $1: tex file
 	pdflatex $(PDF_LATEX_FLAGS) -output-directory "$(dir $(1))" \
 		"$(1)" $(PDF_LATEX_REDIRECT) || ( \
-		$(RM) $(1:.tex=.pdf) && false)
+		$(RM) "$(1:.tex=.pdf)" && false)
 endef
 # LaTeX recompile rule
 define pdf-latex-recompile # $1: tex file
 	grep -i -E '(There were undefined references|rerun to get)' \
-		"$*.log" &> /dev/null
+		"$*.log" $(NULL_OUTPUT)
 endef
 # Makes the bibliography file ($1: bib file)
-pdf-bibtex=bibtex $(1:.bib=) $(PDF_LATEX_REDIRECT)
+pdf-bibtex=bibtex "$(1:.bib=)" $(PDF_LATEX_REDIRECT)
 # Makes the index file ($1: idx file)
-pdf-makeindex=makeindex $(1) $(PDF_LATEX_REDIRECT)
-# Makes the glossaries ($1: without extension)
-pdf-makeglossaries=makeglossaries $(1) $(PDF_LATEX_REDIRECT)
+pdf-makeindex=makeindex "$(1)" $(PDF_LATEX_REDIRECT)
+# Makes the glossaries ($1: glo file)
+pdf-makeglossaries=makeglossaries "$(1:.glo=)" $(PDF_LATEX_REDIRECT)
 # Opens a pdf file ($1: pdf file)
-pdf-viewer=$(VIEWER) $(1) $(PDF_LATEX_REDIRECT)
+pdf-viewer=$(VIEWER) "$(1)" $(PDF_LATEX_REDIRECT)
+# Converts an SVG file into another format ($1: svg file; $2: destination)
+ifeq (x,x$(shell which inkscape 2> /dev/null))
+	svg-convert=convert "$(1)" "$(2)"
+else
+	svg-convert=inkscape "--export-$(subst .,,$(suffix $@))=$(2)" "$(1)"
+endif
 
 ## Environment options
 NULL_OUTPUT=> /dev/null 2> /dev/null
@@ -105,7 +112,7 @@ else
 	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS) -interaction batchmode
 	PDF_LATEX_REDIRECT=$(NULL_OUTPUT) < /dev/null
 endif
-RECOMPILE=yes
+PDF_IMAGE_DENSITY=600
 
 ## Colors
 COLOR_MSG=0;36m
@@ -232,16 +239,16 @@ images: $(IMG_ALL)
 
 %.eps %.pdf %.png: %.dia
 	@$(MSG_BEGIN) Generating $@ from dia $(MSG_END)
-	( cd $(dir $<) && $(DIA) --export=$(notdir $@) $(notdir $<) )
+	( cd "$(dir $<)" && $(DIA) "--export=$(notdir $@)" "$(notdir $<)" )
 
 %.eps %.pdf %.png: %.dot
 	@$(MSG_BEGIN) Generating $@ from dot $(MSG_END)
-	( cd $(dir $<) && $(GRAPHVIZ_DOT) -T$(subst .,,$(suffix $@)) \
-		-o $(notdir $@) $(notdir $<) )
+	( cd "$(dir $<)" && $(GRAPHVIZ_DOT) -T$(subst .,,$(suffix $@)) \
+		-o "$(notdir $@)" "$(notdir $<)" )
 
 .eps.pdf:
 	@$(MSG_BEGIN) Generating $@ from pdf $< $(MSG_END)
-	epspdf $< $@
+	epspdf "$<" "$@"
 
 .java.dot:
 	@$(MSG_BEGIN) Generating $@ from java $(MSG_END)
@@ -251,7 +258,7 @@ images: $(IMG_ALL)
 
 .pdf.png:
 	@$(MSG_BEGIN) Generating $@ from pdf $(MSG_END)
-	convert -density 600x600 $< $@
+	convert -density $(PDF_IMAGE_DENSITY)x$(PDF_IMAGE_DENSITY) "$<" "$@"
 
 %.png %.svg %.txt: %.plant
 	@$(MSG_BEGIN) Generating $@ from plant $(MSG_END)
@@ -260,24 +267,20 @@ images: $(IMG_ALL)
 
 %.svg: %.pic
 	@$(MSG_BEGIN) Generating $@ from pic $(MSG_END)
-	( cd $(SCRIPT_DIR) && pic2plot -T$(subst .,,$(suffix $@)) \
+	( cd "$(SCRIPT_DIR)" && pic2plot -T$(subst .,,$(suffix $@)) \
 		"$(abspath $<)" > "$(abspath $@)" )
 
 .sh.png:
 	@$(MSG_BEGIN) Generating $@ from sh $(MSG_END)
-	( cd $(dir $<) && ./$(notdir $<) png > $(notdir $@) )
+	( cd "$(dir $<)" && "./$(notdir $<)" png > "$(notdir $@)" )
 
 %.eps %.pdf %.png: %.svg
 	@$(MSG_BEGIN) Generating $@ from svg $(MSG_END)
-	which inkscape &> /dev/null && ( \
-		inkscape --export-$(subst .,,$(suffix $@))=$@ $< \
-	) || ( \
-		convert $< $@ \
-	)
+	$(call svg-convert,$<,$@)
 
 images-clean:
 	$(foreach f, $(filter %.tex, $(IMG_SRC)), \
-		$(MAKE) $(f).clean; )
+		$(MAKE) "$(f).clean"; )
 	find "$(IMG_ROOT_DIR)" -name "*-eps-converted-to.pdf" | xargs $(RM)
 
 images-distclean: images-clean
