@@ -8,7 +8,7 @@
 \def\titlepageBottom{%
 \begin{tabular}{>{\raggedleft}p{0.3\linewidth}p{0.3\linewidth}}
 \ifthenelse{\isundefined{\titlepageCourse}}{}{
-\coursename: & \mbox{\titlepageCourse} \\
+\coursename: & \titlepageCourse \\
 }
 \ifthenelse{\isundefined{\titlepageProfessors}}{}{
 \professorname: & \MapListX{\titlepageCommaMBox}{\titlepageProfessors} \\
