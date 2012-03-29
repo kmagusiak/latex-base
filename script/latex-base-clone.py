@@ -82,10 +82,11 @@ def file_update(dest, src, only_create=False):
 	If only_create is True, nothing happens if the destination file already
 	exists.
 	"""
-	if not os.path.exists(src):
-		raise AbortException('Source does not exist: %s' % src)
+	if not os.path.isfile(src):
+		raise AbortException('Source is not a file: %s' % src)
 	if os.path.exists(dest):
 		if (only_create
+			or os.path.isdir(dest)
 			or os.path.getmtime(dest) >= os.path.getmtime(src)
 			or hash_file(dest) == hash_file(src)):
 			return False
@@ -100,6 +101,9 @@ def file_update(dest, src, only_create=False):
 		if not confirm("Overwrite the file?"):
 			raise AbortException()
 	print('Updating file: %s' % dest)
+	destdir = os.path.dirname(dest)
+	if not os.path.exists(destdir):
+		os.makedirs(destdir)
 	shutil.copyfile(src, dest)
 	return True
 
@@ -121,9 +125,6 @@ def check_latex_base_directory(path, brep=False):
 def update_files(dest, src):
 	""" Updates the files by copying what is necessary """
 	check_latex_base_directory(src)
-	# Create directories
-	for dirname in ['img']:
-		dir_update(os.path.join(dest, dirname))
 	# Update directories
 	for nextdir in ['input', 'script']:
 		dir_update(os.path.join(dest, nextdir), os.path.join(src, nextdir))
