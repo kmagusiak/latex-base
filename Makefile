@@ -43,19 +43,25 @@ include $(INTERN_MAKE_FILES)
 DOCUMENTS=$(DOC:.tex=.pdf)
 
 ## Images
-IMG_ROOT_DIR=img
+IMG_ROOT_DIR=$(shell test -d img && echo img)
 IMG_STATIC_EXTENSIONS=eps jpg pdf png
-IMG_FOUND=$(sort $(foreach ext, $(IMG_STATIC_EXTENSIONS), \
-	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
 IMG_SRC_EXTENSIONS=dia dot java pic plant sh svg tex
-IMG_SRC=$(sort $(foreach ext, $(IMG_SRC_EXTENSIONS), \
-	$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
-IMG_GENERATED=$(sort \
-	$(filter %.pdf, $(foreach ext, dia dot java pic plant svg tex, \
-	$(patsubst %.$(ext),%.pdf, $(IMG_SRC)))) \
-	$(filter %.png, $(foreach ext, sh, \
-	$(patsubst %.$(ext),%.png, $(IMG_SRC)))) \
-	)
+ifeq (x,x$(IMG_ROOT_DIR))
+	IMG_FOUND=
+	IMG_SRC=
+	IMG_GENERATED=
+else
+	IMG_FOUND=$(sort $(foreach ext, $(IMG_STATIC_EXTENSIONS), \
+		$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
+	IMG_SRC=$(sort $(foreach ext, $(IMG_SRC_EXTENSIONS), \
+		$(shell find $(IMG_ROOT_DIR) -name '*.$(ext)')))
+	IMG_GENERATED=$(sort \
+		$(filter %.pdf, $(foreach ext, dia dot java pic plant svg tex, \
+		$(patsubst %.$(ext),%.pdf, $(IMG_SRC)))) \
+		$(filter %.png, $(foreach ext, sh, \
+		$(patsubst %.$(ext),%.png, $(IMG_SRC)))) \
+		)
+endif
 IMG_ALL=$(sort $(IMG_FOUND) $(IMG_GENERATED))
 IMG_STATIC=$(filter-out $(IMG_GENERATED), $(IMG_ALL))
 
@@ -281,7 +287,9 @@ images: $(IMG_ALL)
 images-clean:
 	$(foreach f, $(filter %.tex, $(IMG_SRC)), \
 		$(MAKE) "$(f).clean"; )
+ifneq (x,x$(IMG_ROOT_DIR))
 	find "$(IMG_ROOT_DIR)" -name "*-eps-converted-to.pdf" | xargs $(RM)
+endif
 
 images-distclean: images-clean
 	$(foreach f,$(IMG_GENERATED),$(call rm-echo,$(f));)
@@ -306,7 +314,10 @@ endif
 	$(RM) $(INTERN_MAKE_DEPS)
 
 clean-all: distclean
-	$(RM) *~ $(IMG_ROOT_DIR)/*~
+	$(RM) *~
+ifneq (x,x$(IMG_ROOT_DIR))
+	$(RM) $(IMG_ROOT_DIR)/*~
+endif
 
 list:
 	@echo "# PDF files"
