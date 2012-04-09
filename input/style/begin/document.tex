@@ -6,8 +6,7 @@
 \maketitle
 }{
 \input{input/title/title_\doctitlepagename}
-}
-}
+}}
 
 \ifthenelse{\isundefined{\docabstract}}{}{
 \ifthenelse{\equal{\docabstract}{}}{}{
@@ -19,13 +18,22 @@
 %\clearpage
 
 %% Headers and footers
-\lhead[\nouppercase{\leftmark}]{}
-\chead{}
-\rhead[]{\itshape\doctitle}
-\lfoot[\ofname{\thepage{}}{\pageref{LastPage}}]%
-{\footnotesize\docauthor}
-\cfoot{}
-\rfoot[]{\ofname{\thepage{}}{\pageref{LastPage}}}
+% \leftmark: current chapter
+% \rightmark: current section
+% \fancy----: Left, Center, Right, Even, Odd
+\fancyhead{}
+\fancyhead[RO]{\itshape\doctitle}
+\fancyhead[LE]{\nouppercase{\leftmark}}
+\fancyfoot{}
+\fancyfoot[RO,LE]{\ofname{\thepage{}}{\pageref{LastPage}}}
+\fancyfoot[LO]{\footnotesize\docauthor}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+% Redefine plain style for chapters, etc.
+\fancypagestyle{plain}{
+	\fancyhead{}
+	\renewcommand{\headrulewidth}{0pt}
+}
 
 %% TOC
 \ifthenelse{\isundefined{\doctocdepth}}{}{
@@ -37,8 +45,7 @@
 %% Page jump
 \ifthenelse{\isundefined{\doctitlepagename}}{}{
 \ifthenelse{\equal{\doctitlepagename}{}}{
-\vspace{\fill}
+\vspace{2cm}
 }{
 \clearpage
-}
-}
+}}
