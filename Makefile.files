@@ -3,18 +3,13 @@
 ############################
 
 ## Document list (tex files)
-DOC=document.tex \
-	letter.tex \
-	presentation.tex \
-	presentation-article.tex \
-	simple.tex \
-	tikz.tex \
+#DOC=$(DOC_AUTOFIND)
+
+## Dependencies (automatically built)
+#DOC_AUTODEP=$(DOC)
 
 ## Dependencies
 #document.pdf: document.tex input-listings.tex
-
-## Dependencies (automatically built)
-DOC_AUTODEP=$(DOC)
 
 ## Environment variables
 #DIA=dia

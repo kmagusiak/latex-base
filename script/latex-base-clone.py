@@ -4,6 +4,7 @@
 import hashlib
 import os
 import os.path
+import re
 import shutil
 import subprocess
 import sys
@@ -53,7 +54,7 @@ def get_base_directory():
 def hash_file(path):
 	""" Returns a hash of a file. """
 	with open(path, 'rb') as fp:
-		hashlib.md5(fp.read()).hexdigest()
+		return hashlib.md5(fp.read()).hexdigest()
 
 # ------------------------------------------------------------------------------
 
@@ -133,26 +134,7 @@ def update_files(dest, src):
 		file_update(os.path.join(dest, f), os.path.join(src, f))
 	# file: Makefile.files
 	f = 'Makefile.files'
-	dest_f = os.path.join(dest, f)
-	if file_update(dest_f, os.path.join(src, f),
-		only_create=True):
-		update_make_files(dest_f)
-
-def update_make_files(path, up=None):
-	""" Updates DOC variable inside Makefile.files """
-	with open(path, 'r+') as fp:
-		files, before, after = read_make_files_all(fp, "DOC=")
-		if up is None:
-			files = []
-		else:
-			files = up(files)
-		fp.seek(0)
-		fp.write("".join(before))
-		fp.write("DOC=")
-		fp.write(" \\\n\t".join(files))
-		fp.write("\n")
-		fp.write("".join(after))
-		fp.truncate()
+	file_update(os.path.join(dest, f), os.path.join(src, f), only_create=True)
 
 def read_make_files(filename, prefix):
 	""" Reads files from a Makefile file which are entered as dependencies """
@@ -199,13 +181,21 @@ def read_make_files_all(fp, prefix):
 
 def list_templates(directory):
 	""" Lists template files declared in Makefile.files """
-	return read_make_files(os.path.join(directory, 'Makefile.files'), "DOC=")
+	p = subprocess.Popen(['make', 'debug-DOC'],
+			cwd=directory,
+			stdout=subprocess.PIPE)
+	p.poll()
+	result = p.communicate()[0]
+	for line in result.split("\n"):
+		if not line.startswith("DOC="): continue
+		return re.split('\\s+', line[4:].strip())
+	return [] # not found
 
 def update_template(name, dest, src, deps=None):
 	""" Updates a template file """
 	f_dest = os.path.join(dest, name)
 	f_src = os.path.join(src, name)
-	print("Create '%s' from '%s'..." % (f_dest, f_src))
+	print("Creating '%s' from '%s'..." % (f_dest, f_src))
 	if not os.path.isfile(f_src):
 		raise AbortException('Source is not a file')
 	if os.path.exists(f_dest) and not confirm(
@@ -224,18 +214,17 @@ def update_template(name, dest, src, deps=None):
 			name.replace('.tex', '.pdf') + ':'):
 			if d == name: continue
 			file_update(os.path.join(dest, d), os.path.join(src, d))
-	# Add to Makefile.files
-	if confirm("Update Makefile.files?", default=True):
-		update_make_files(os.path.join(dest, 'Makefile.files'),
-			lambda l : sorted(l + [name]))
 
 # ------------------------------------------------------------------------------
 
-def command_init(path, base=get_base_directory()):
+def command_init(path='', base=get_base_directory()):
 	path = os.path.join(os.getcwd(), path)
-	if os.path.exists(path):
+	exists = os.path.exists(path)
+	if (exists and
+		not confirm("Directory '%s' already exists, continue?" % path,
+			default=False)):
 		raise AbortException("'%s' already exists." % path)
-	os.mkdir(path)
+	if not exists: os.mkdir(path)
 	update_files(path, base)
 	print('Done.')
 
@@ -252,7 +241,10 @@ def command_template(name='', base=get_base_directory()):
 		for t in list_templates(base):
 			print('  ' + t)
 		print('')
-		name = prompt("Enter a template name:")
+		try:
+			name = prompt("Enter a template name:")
+		except EOFError:
+			name = ''
 		if name == '':
 			raise AbortException('No name entered')
 	# Check
@@ -271,7 +263,7 @@ def command_template(name='', base=get_base_directory()):
 if __name__ == '__main__':
 	def usage():
 		script_name = os.path.basename(sys.argv[0])
-		print('Usage: %s init PATH [BASE]' % script_name)
+		print('Usage: %s init [PATH] [BASE]' % script_name)
 		print('       %s update [BASE]' % script_name)
 		print('       %s template [NAME] [BASE]' % script_name)
 		print('')

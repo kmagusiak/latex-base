@@ -83,9 +83,10 @@ directory, not the current one.
 Editing files
 -------------
 The user selects the type of documents they want to use and make a copy of these
-on the root of the project. Then, they register these files in `Makefile.files`.
-Optionally, they edit the input styles by making a copy of an existing style and
-changing it. Then, images should be added to `img`.
+on the root of the project.
+Optionally, they register these files explicitely in `Makefile.files` and they
+edit the input styles by making a copy of an existing style and changing it.
+Then, images should be added to `img`.
 It is also good to adopt a naming strategy if more than one resulting file will
 be present in the project, such as a common prefix.
 
@@ -98,6 +99,10 @@ For a list of targets, run:
 
 If you want the output of LaTeX, run:
 	make VERBOSE=yes
+
+For debugging purposes, a target debug-* is added for listing values of the
+variables:
+	make debug-DOC debug-DOC_AUTODEP
 
 Useful links and tutorials
 ==========================
