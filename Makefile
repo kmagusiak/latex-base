@@ -36,6 +36,13 @@ INTERN_MAKE_DEPGEN=$(SCRIPT_DIR)/latex-depgen.py
 INTERN_MAKE_FILES=Makefile.files
 INTERN_MAKE_DEPS=Makefile.d
 
+## Include dependencies
+#DOC_AUTOFIND=$(shell grep -l -m 1 -E '^\s*\\documentclass' *.tex )
+DOC_AUTOFIND=$(shell for f in $$(ls *.tex 2> /dev/null ); do \
+	awk '/^\s*\\documentclass/ { print FILENAME } /^\s*($$|%)/ {next} {exit}' \
+	"$$f"; done )
+DOC=$(DOC_AUTOFIND)
+DOC_AUTODEP=$(DOC)
 include $(INTERN_MAKE_FILES)
 -include $(INTERN_MAKE_DEPS)
 
@@ -164,6 +171,7 @@ help:
 	@echo "RECOMPILE: whether LaTeX files are recompiled"
 	@echo "VERBOSE: when set, latex command prints the output"
 	@echo "VIEWER: the viewer for PDF files"
+	@echo "target debug-*: shows the value of a variable"
 
 debug-%:
 	@echo "$*=$($*)"
