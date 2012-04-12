@@ -10,7 +10,10 @@
 \usepackage{algorithmicx,algpseudocode}
 
 %% Default style
-\lstset{basicstyle=\ttfamily\small
+\ifthenelse{\isundefined{\lstbasicstyle}}{%
+\def\lstbasicstyle{\ttfamily\small}%
+}{}
+\lstset{basicstyle=\lstbasicstyle
 	,tabsize=4
 %	,frame=single
 %	,numbers=left
@@ -34,7 +37,7 @@
 
 %% Default
 \lstdefinestyle{defaultColors}{
-	basicstyle=\ttfamily
+	basicstyle=\lstbasicstyle
 	,commentstyle=\color{listingsComment}\itshape
 	,identifierstyle=\color{listingsIdentifier}
 	,keywordstyle=\color{listingsKeyword}\bfseries
@@ -59,7 +62,7 @@
 \definecolor{colHaskellKeyword}{rgb}{0,0.4,0.8}
 \lstdefinestyle{haskell}{style=defaultColors
 	,language=Haskell
-	,basicstyle=\ttfamily\color{colHaskellBase}
+	,basicstyle=\lstbasicstyle\color{colHaskellBase}
 	,identifierstyle=\color{black}
 	,keywordstyle=\color{colHaskellKeyword}\bfseries
 }
