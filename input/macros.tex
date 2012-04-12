@@ -43,6 +43,8 @@
 	\includeimagebase[keepaspectratio=true,#1]{#2}
 	\end{center}
 }
+% \includeimagefigure[imageoptions][figureplacement][shortcaption]
+% {imagename}{Caption}
 \long\def\includeimagefigure@multi[#1][#2][#3]#4#5{
 	\begin{figure}[#2]
 	\centering
@@ -63,8 +65,11 @@
 }
 
 %% References
+\newcommand{\seeref}[1]{%
+	\hyperref[#1]{\seename{}~\ref{#1}}%
+}
 \newcommand{\shortref}[1]{%
-	\hyperref[#1]{\ref{#1} - \MakeLowercase{\pagename} \pageref{#1}}%
+	\hyperref[#1]{\ref{#1}~-~\MakeLowercase{\pagename}~\pageref{#1}}%
 }
 \newcommand{\textref}[2]{\hyperref[#1]{#2 [\shortref{#1}]}}
 
