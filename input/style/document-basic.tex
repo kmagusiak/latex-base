@@ -15,6 +15,25 @@
 	,filecolor=magenta
 	}
 
+%% Biblatex options
+% Uncomment if URLs should start in a new line
+\ifthenelse{\equal{false}{true}}{%
+\DeclareFieldFormat{formaturl}{\newline \small #1}
+\newbibmacro*{url+urldate}{%
+	\iffieldundef{url}{}{%
+		\printtext[formaturl]{\printfield{url}}%
+		\iffieldundef{urlyear}{}%
+		{\setunit*{\addspace}%
+		\printtext[urldate]{\printurldate}}%
+	}%
+}
+\newbibmacro*{doi+eprint+url}{%
+	\iffieldundef{doi}{zz}{%
+		\printtext[formaturl]{\printfield{doi}}%
+	}%
+}
+}{}
+
 %% Theorem
 \input{input/theorem}
 

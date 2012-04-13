@@ -43,7 +43,7 @@ DOC_AUTOFIND=$(shell for f in $$(ls *.tex 2> /dev/null ); do \
 	"$$f"; done )
 DOC=$(DOC_AUTOFIND)
 DOC_AUTODEP=$(DOC)
-include $(INTERN_MAKE_FILES)
+-include $(INTERN_MAKE_FILES)
 -include $(INTERN_MAKE_DEPS)
 
 ## Derived files
@@ -180,7 +180,8 @@ depend:
 	$(RM) $(INTERN_MAKE_DEPS)
 	$(MAKE) FORCE
 
-$(INTERN_MAKE_DEPS): $(INTERN_MAKE_FILES) $(INTERN_MAKE_DEPGEN)
+$(INTERN_MAKE_DEPS): $(INTERN_MAKE_DEPGEN) \
+	$(shell test -f "$(INTERN_MAKE_FILES)" && echo "$(INTERN_MAKE_FILES)" )
 	@$(MSG_BEGIN) Dependency generation... $(MSG_END)
 ifeq (x,x$(DOC_AUTODEP))
 	echo "# Empty dependency file" > $@
