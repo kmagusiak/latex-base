@@ -134,7 +134,9 @@ def update_files(dest, src):
 		file_update(os.path.join(dest, f), os.path.join(src, f))
 	# file: Makefile.files
 	f = 'Makefile.files'
-	file_update(os.path.join(dest, f), os.path.join(src, f), only_create=True)
+	srcf = os.path.join(src, f)
+	if os.path.exists(srcf):
+		file_update(os.path.join(dest, f), srcf, only_create=True)
 
 def read_make_files(filename, prefix):
 	""" Reads files from a Makefile file which are entered as dependencies """

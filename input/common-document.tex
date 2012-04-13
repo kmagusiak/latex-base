@@ -24,23 +24,6 @@
 \usepackage[natbib=false
 	%,sorting=none
 	]{biblatex}
-% Uncomment if URLs should start in a new line
-\ifthenelse{\equal{false}{true}}{%
-\DeclareFieldFormat{formaturl}{\newline \small #1}
-\newbibmacro*{url+urldate}{%
-	\iffieldundef{url}{}{%
-		\printtext[formaturl]{\printfield{url}}%
-		\iffieldundef{urlyear}{}%
-		{\setunit*{\addspace}%
-		\printtext[urldate]{\printurldate}}%
-	}%
-}
-\newbibmacro*{doi+eprint+url}{%
-	\iffieldundef{doi}{zz}{%
-		\printtext[formaturl]{\printfield{doi}}%
-	}%
-}
-}{}
 
 %% Glossaries
 \usepackage[acronym
