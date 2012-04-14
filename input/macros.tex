@@ -35,12 +35,12 @@
 \newcommand{\MapListX}[3][,]{\expandafter\MapList@call\expandafter{#3}{#1}{#2}}
 
 %% Images
-\newcommand{\includeimagebase}[2][keepaspectratio=true]{%
-	\includegraphics[#1]{img/#2}%
+\newcommand{\includeimagebase}[2][scale=1.0]{%
+	\includegraphics[keepaspectratio=true,#1]{img/#2}%
 }
 \newcommand{\includeimage}[2][scale=1.0]{
 	\begin{center}
-	\includeimagebase[keepaspectratio=true,#1]{#2}
+	\includeimagebase[#1]{#2}
 	\end{center}
 }
 % \includeimagefigure[imageoptions][figureplacement][shortcaption]
@@ -48,16 +48,13 @@
 \long\def\includeimagefigure@multi[#1][#2][#3]#4#5{
 	\begin{figure}[#2]
 	\centering
-	\vspace{-0.5em}
-	\includeimagebase[keepaspectratio=true,#1]{#4}
-	\vspace{-1em}
+	\includeimagebase[#1]{#4}
 	\ifthenelse{\equal{#3}{}}{
 		\caption{#5}
 	}{
 		\caption[#3]{#5}
 	}
 	\label{img:#4}
-	\vspace{-0.5em}
 	\end{figure}
 }
 \newcommand{\includeimagefigure}{%
