@@ -34,13 +34,7 @@ def getTexFileDep(filename, dep = None):
 		match_arg_ignore = '\\{.+?\\}'
 		match_opt = '(?:\\[[^\\]]*\\])?'
 		match_opt_arg = match_opt + match_arg
-		old_line = ''
-		for line in f:
-			(line, unfinished) = stripLatexLine(line, old_line)
-			if unfinished:
-				old_line = line
-				continue
-			old_line = ''
+		for line in latexLines(f):
 			if line == '': continue
 			# -------------------------------
 			# document class
@@ -116,20 +110,25 @@ def getTexFileDepMatch(dep, line, regex,
 	if os.path.splitext(f)[1] == '.tex':
 		getTexFileDep(f, dep)
 
-def stripLatexLine(line, old_line = ''):
-	"""Removes comments and strips a tex line."""
-	unfinished = False
-	line = line.strip()
-	i = line.find('%')
-	if i == 0:
-		return (old_line, unfinished)
-	while i > 0:
-		if line[i - 1] != '\\':
-			unfinished = (i == len(line) - 1)
-			line = line[:i]
-			break
-		i = line.find('%', i + 1)
-	return (old_line + line.strip(), unfinished)
+def latexLines(f):
+	"""Generator for relevant latex lines (without comments or spaces)."""
+	acc = ''
+	result = True
+	for line in f:
+		result = True
+		i = line.find('%')
+		while i >= 0:
+			if i == 0 or line[i - 1] != '\\':
+				result = False
+				line = line[:i]
+				break
+			i = line.find('%', i + 1)
+		acc += line
+		if result:
+			yield acc
+			acc = ''
+	if not result:
+		yield acc
 
 def writeDep(out, dep):
 	"""Writes a dependency file"""

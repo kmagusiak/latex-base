@@ -63,8 +63,13 @@ class AbortException(Exception):
 	def __init__(self, message='Aborted'):
 		super(Exception, self).__init__(message)
 
-def dir_update(dest, recursive_src=None):
+def dir_update(dest, recursive_src=None, optional=False, ask=False):
+	if not os.path.isdir(recursive_src) and optional:
+		return
 	if not os.path.isdir(dest):
+		if ask and not confirm("Copy the directory '%s'?" % recursive_src,
+				default=True):
+			return
 		print('Creating directory: %s' % dest)
 		os.mkdir(dest)
 	if recursive_src is None:
@@ -77,13 +82,14 @@ def dir_update(dest, recursive_src=None):
 		elif os.path.isdir(f_src):
 			dir_update(f_dest, f_src)
 
-def file_update(dest, src, only_create=False):
+def file_update(dest, src, only_create=False, optional=False):
 	"""
 	Updates a single file.
 	If only_create is True, nothing happens if the destination file already
 	exists.
 	"""
 	if not os.path.isfile(src):
+		if optional: return False
 		raise AbortException('Source is not a file: %s' % src)
 	if os.path.exists(dest):
 		if (only_create
@@ -126,17 +132,20 @@ def check_latex_base_directory(path, brep=False):
 def update_files(dest, src):
 	""" Updates the files by copying what is necessary """
 	check_latex_base_directory(src)
-	# Update directories
-	for nextdir in ['input', 'script']:
-		dir_update(os.path.join(dest, nextdir), os.path.join(src, nextdir))
-	# Update files
+	# Directories
+	for f in ['script']:
+		dir_update(os.path.join(dest, f), os.path.join(src, f))
+	# Files
 	for f in ['Makefile']:
 		file_update(os.path.join(dest, f), os.path.join(src, f))
+	# dir: input
+	f = 'input'
+	dir_update(os.path.join(dest, f), os.path.join(src, f),
+			optional=True, ask=True)
 	# file: Makefile.files
 	f = 'Makefile.files'
-	srcf = os.path.join(src, f)
-	if os.path.exists(srcf):
-		file_update(os.path.join(dest, f), srcf, only_create=True)
+	file_update(os.path.join(dest, f), os.path.join(src, f),
+			only_create=True, optional=True)
 
 def read_make_files(filename, prefix):
 	""" Reads files from a Makefile file which are entered as dependencies """
