@@ -44,7 +44,7 @@
 	\end{center}
 }
 % \includeimagefigure[imageoptions][figureplacement][shortcaption]
-% {imagename}{Caption}
+% {imagename}{caption}
 \long\def\includeimagefigure@multi[#1][#2][#3]#4#5{
 	\begin{figure}[#2]
 	\centering
@@ -59,6 +59,18 @@
 }
 \newcommand{\includeimagefigure}{%
 	\optparams{\includeimagefigure@multi}{[scale=1.0][H][]}%
+}
+% \begin{imagefigure}[figureplacement]{imageoptions}{imagename}{caption}
+\newenvironment{imagefigure}[4][H]{%
+	\begin{figure}[#1]
+	\centering
+	\includeimagebase[#2]{#3}
+	\caption{#4}
+	\label{img:#3}
+	\begin{minipage}{0.9\linewidth}
+}{%
+	\end{minipage}
+	\end{figure}
 }
 
 %% References
