@@ -1,0 +1,17 @@
+%% Headers and footers
+% \leftmark: current chapter
+% \rightmark: current section
+% \fancy----: Left, Center, Right, Even, Odd
+\fancyhead{}
+\fancyhead[RO]{\itshape\doctitle}
+\fancyhead[LE]{\nouppercase{\leftmark}}
+\fancyfoot{}
+\fancyfoot[RO,LE]{\ofname{\thepage{}}{\pageref{LastPage}}}
+\fancyfoot[LO]{\footnotesize\docauthor}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+% Redefine plain style for chapters, etc.
+\fancypagestyle{plain}{
+	\fancyhead{}
+	\renewcommand{\headrulewidth}{0pt}
+}
