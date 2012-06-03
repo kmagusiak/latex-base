@@ -21,7 +21,13 @@
 
 \vspace*{\fill}
 \begin{doublespace}
-{\LARGE \scshape \@title} \\[8mm]
+{\LARGE \scshape \@title}
+\ifthenelse{\isundefined{\docsubject}}{}{
+\ifthenelse{\equal{\docsubject}{}}{}{
+	\newline
+	\Large \docsubject
+}}
+\\[8mm]
 {\Large \scshape \begin{tabular}{c} \@author \end{tabular}} \\[6mm]
 {\normalsize \@date}
 {\@thanks}
