@@ -13,7 +13,7 @@ assert IMG_EXT_DEF in IMG_EXT_NORMAL
 LISTINGS_EXT = [
 	'c', 'cpp', 'erl', 'h', 'hs',
 	'idl', 'java', 'lsp', 'php',
-	'py', 'tex']
+	'py', 'sh', 'tex']
 
 def getTexFileDep(filename, dep = None):
 	"""Generates dependencies for a tex file."""
