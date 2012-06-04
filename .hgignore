@@ -10,6 +10,8 @@ Makefile.d
 *.bbl
 *.blg
 *.fax
+*.fdb_latexmk
+*.fls
 *.glg
 *.glo
 *.gls

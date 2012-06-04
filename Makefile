@@ -11,9 +11,9 @@ all: compile_clean
 # Variables and commands
 DIA=dia
 GRAPHVIZ_DOT=dot
+LATEXMK=$(shell which latexmk 2> /dev/null)
 PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 PYTHON=python
-RECOMPILE=yes
 RM=rm -f
 SCRIPT_DIR=script
 SHELL=/bin/sh
@@ -108,6 +108,20 @@ pdf-makeindex=makeindex "$(1)" $(PDF_LATEX_REDIRECT)
 pdf-makeglossaries=makeglossaries "$(1:.glo=)" $(PDF_LATEX_REDIRECT)
 # Opens a pdf file ($1: pdf file)
 pdf-viewer=$(VIEWER) "$(1)" $(PDF_LATEX_REDIRECT)
+# LaTeXmk ($1: tex file)
+define pdf-latexmk # $1: tex file
+	( cd "$(dir $(1))" && ( \
+	$(RM) "$(notdir $(1:.tex=.fdb_latexmk))"; \
+	"$(LATEXMK)" $(LATEXMK_FLAGS) \
+		-pdf -dvi- -ps- -gg "$(notdir $(1))" $(PDF_LATEX_REDIRECT) || ( \
+		$(RM) "$(notdir $(1:.tex=.pdf))" && false) \
+	))
+endef
+define pdf-latexmk-clean # $1: tex file
+	"$(LATEXMK)" $(LATEXMK_FLAGS) \
+		-output-directory="$(dir $(1))" \
+		-c "$(1)" $(NULL_OUTPUT)
+endef
 # Converts an SVG file into another format ($1: svg file; $2: destination)
 ifeq (x,x$(shell which inkscape 2> /dev/null))
 	svg-convert=convert "$(1)" "$(2)"
@@ -118,12 +132,15 @@ endif
 ## Environment options
 NULL_OUTPUT=> /dev/null 2> /dev/null
 PDF_LATEX_COMMON_FLAGS=-shell-escape
+LATEXMK_COMMON_FLAGS=-r "$(abspath $(SCRIPT_DIR)/latexmkrc)"
 ifneq (xno,x$(VERBOSE))
 	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS)
 	PDF_LATEX_REDIRECT=
+	LATEXMK_FLAGS=$(LATEXMK_COMMON_FLAGS)
 else
 	PDF_LATEX_FLAGS=$(PDF_LATEX_COMMON_FLAGS) -interaction batchmode
 	PDF_LATEX_REDIRECT=$(NULL_OUTPUT) < /dev/null
+	LATEXMK_FLAGS=$(LATEXMK_COMMON_FLAGS) -silent
 endif
 PDF_IMAGE_DENSITY=600
 
@@ -202,6 +219,7 @@ latex: $(DOCUMENTS)
 	$(call pdf-viewer,$*.pdf)
 
 .tex.pdf:
+ifeq (x,x$(LATEXMK))
 	@$(MSG_BEGIN) LaTeX compile: $* $(MSG_END)
 	$(call pdf-latex,$<)
 	test ! -s "$*.aux" \
@@ -211,7 +229,6 @@ latex: $(DOCUMENTS)
 		|| ($(MAKE) "$*.ind"; echo "rerun to get the index" >> "$*.log")
 	!( test -s "$*.glo" || test -s "$*.acn" ) \
 		|| ($(MAKE) "$*.glg"; echo "rerun to get the glossaries" >> "$*.log")
-ifeq (x$(RECOMPILE),xyes)
 	!($(call pdf-latex-recompile,$<)) || ( \
 	   $(MSG_BEGIN) LaTeX recompile: $* $(MSG_END); \
 	   $(call pdf-latex,$<); \
@@ -220,6 +237,9 @@ ifeq (x$(RECOMPILE),xyes)
 	   	   $(call pdf-latex,$<); \
    	   ) \
 	)
+else
+	@$(MSG_BEGIN) LaTeXmk: $* $(MSG_END)
+	$(call pdf-latexmk,$<)
 endif
 
 .aux.bbl:
@@ -235,13 +255,15 @@ endif
 	$(call pdf-makeglossaries,$*)
 
 %.tex.clean:
-	$(RM) \
-		$*.acn $*.acr $*.alg $*.aux $*.bbl $*.blg $*.fax $*.glg \
-		$*.glo $*.gls $*.idx $*.ilg $*.ind $*.ist $*.lof $*.log \
-		$*.loh $*.loi $*.lot $*.nav $*.out $*.snm $*.tns $*.toc \
-		$*.vrb \
-		$*.*.gnuplot $*.*.table \
-		$*.run.xml $*-blx.bib
+ifneq (x,x$(LATEXMK))
+	$(call pdf-latexmk-clean,$*.tex)
+else
+	$(RM) $(foreach e,\
+		acn acr alg aux bbl blg fax glg glo gls idx ilg ind ist \
+		lof log loh loi lot nav out snm tns toc vrb \
+		run.xml *.gnuplot *.table \
+		,$*.$(e)) $*-blx.bib
+endif
 
 latex-clean: $(DOC:.tex=.tex.clean)
 	$(RM) *.aux
@@ -301,7 +323,6 @@ endif
 
 images-distclean: images-clean
 	$(foreach f,$(IMG_GENERATED),$(call rm-echo,$(f));)
-
 
 ###########
 # General #
