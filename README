@@ -24,6 +24,7 @@ Optional dependencies:
 - gnuplot
 - graphviz
 - inkscape or imagemagick
+- latexmk
 - plantuml
 - plotutils
 - umlgraph (included)
@@ -101,6 +102,10 @@ For a list of targets, run:
 
 If you want the output of LaTeX, run:
 	make VERBOSE=yes
+
+For a quick build use:
+	make -sj3
+Where `3` is the number of concurrent tasks.
 
 For debugging purposes, a target debug-* is added for listing values of the
 variables:
