@@ -37,30 +37,32 @@ Description of documents and directories
 LaTeX files and input directory
 -------------------------------
 - biblio.bib: BibTeX database
-- document.tex: a simple document
+- document.tex: an example of a document
 	(it contains document-example.tex)
 - presentation.tex: a Beamer presentation
 	(contains the body, metadata and an example)
 - presentation-article.tex: presentation.tex rendered as an article
+- simple.tex: a nearly minimal document
+- simple-presentation.tex: minimal Beamer presentation
 - tikz.tex: a generated image
 
 The directory input contains files that are included by the documents to add
 macros, import a set of packages, define the theme, etc. A document should
-include a *-style.tex file in the prelude and if present a *-begin.tex just
-after the \begin{document} tag.
+include an `input/style/*` file in the prelude.
 
 Images
 ------
-The directory img contains all images manipulated by the project. You can create
-sub-directories to classify your files. Also, files that are source of generated
-images should be in that directory.
+The directory `img` contains all images manipulated by the project. You can
+create sub-directories to classify your files. Also, files that are source of
+generated images should be in that directory.
 
 Scripts and generation
 ----------------------
 There is a Makefile for building the project and auxiliary scripts in the script
 directory. The `Makefile.files` describes what LaTeX files are source of a
-generated document. Finally, the file `Makefile.d` that includes automatic
-dependencies can be generated; it should not be under revision control.
+generated document, by default the files are found automatically.
+Finally, the file `Makefile.d` that includes automatic dependencies can be
+generated; it should not be under revision control.
 
 Basic workflow
 ==============
