@@ -52,7 +52,7 @@ DOCUMENTS=$(DOC:.tex=.pdf)
 ## Images
 IMG_ROOT_DIR=$(shell test -d img && echo img)
 IMG_STATIC_EXTENSIONS=eps jpg pdf png
-IMG_SRC_EXTENSIONS=dia dot java pic plant sh svg tex
+IMG_SRC_EXTENSIONS=dia dot java pic plant svg tex
 ifeq (x,x$(IMG_ROOT_DIR))
 	IMG_FOUND=
 	IMG_SRC=
@@ -112,7 +112,7 @@ pdf-viewer=$(VIEWER) "$(1)" $(PDF_LATEX_REDIRECT)
 ifeq (x,x$(shell which inkscape 2> /dev/null))
 	svg-convert=convert "$(1)" "$(2)"
 else
-	svg-convert=inkscape "--export-$(subst .,,$(suffix $@))=$(2)" "$(1)"
+	svg-convert=inkscape "--export-$(subst .,,$(suffix $(2)))=$(2)" "$(1)"
 endif
 
 ## Environment options
@@ -140,22 +140,31 @@ help:
 	@$(MSG_BEGIN)#########################$(MSG_END)
 	@$(MSG_BEGIN)# Makefile (LaTeX) help #$(MSG_END)
 	@$(MSG_BEGIN)#########################$(MSG_END)
-	@echo "all: compiles the documents and the images then cleans"
+	@echo "all: compiles all and then cleans"
 	@echo "clean: cleans after a compilation"
 	@echo "clean-all: same as distclean but removes also backup files"
 	@echo "compile: compiles the documents and the images"
 	@echo "depend: regenerates the Makefile.d"
 	@echo "distclean: removes all the generated files"
 	@echo "export: exports the pdfs to a directory"
+	@echo "help: this message"
+	@echo "help-transformations: prints the transformations"
+	@echo "list: list all considered files"
+	@$(MSG_BEGIN) Type specific rules $(MSG_END)
 	@echo "images: compiles the images"
 	@echo "images-clean: removes temporary files after compilation"
 	@echo "images-distclean: removes compiled images"
 	@echo "latex: compiles the documents"
 	@echo "latex-clean: removes temporary files after compilation"
 	@echo "latex-distclean: removes the compiled documents"
-	@echo "list: list all considered files"
+	@$(MSG_BEGIN) Generic rules $(MSG_END)
+	@echo "debug-%: shows the value of a variable"
 	@echo "%.pdf.view: compiles and opens a pdf file"
 	@echo "%.tex.clean: cleans temporary files after compilation"
+	@$(MSG_BEGIN) Other $(MSG_END)
+	@echo "Use VERBOSE=1 for verbose output"
+
+help-transformations:
 	@$(MSG_BEGIN) File transformations $(MSG_END)
 	@echo "dia -> {eps,pdf,png} (using dia)"
 	@echo "dot -> {eps,pdf,png} (using graphviz)"
@@ -164,14 +173,8 @@ help:
 	@echo "pdf -> png (using imagemagick)"
 	@echo "pic -> svg (using plotutils)"
 	@echo "plant -> {png,svg} (using plantuml)"
-	@echo "sh -> png (execute with extension argument and pipe the output)"
 	@echo "svg -> {eps,pdf,png} (using inkscape or imagemagick)"
 	@echo "tex -> pdf (using pdflatex)"
-	@$(MSG_BEGIN) Environment variables $(MSG_END)
-	@echo "RECOMPILE: whether LaTeX files are recompiled"
-	@echo "VERBOSE: when set, latex command prints the output"
-	@echo "VIEWER: the viewer for PDF files"
-	@echo "target debug-*: shows the value of a variable"
 
 debug-%:
 	@echo "$*=$($*)"
@@ -285,10 +288,6 @@ images: $(IMG_ALL)
 	( cd "$(SCRIPT_DIR)" && pic2plot -T$(subst .,,$(suffix $@)) \
 		"$(abspath $<)" > "$(abspath $@)" )
 
-.sh.png:
-	@$(MSG_BEGIN) Generating $@ from sh $(MSG_END)
-	( cd "$(dir $<)" && "./$(notdir $<)" png > "$(notdir $@)" )
-
 %.eps %.pdf %.png: %.svg
 	@$(MSG_BEGIN) Generating $@ from svg $(MSG_END)
 	$(call svg-convert,$<,$@)
@@ -302,6 +301,7 @@ endif
 
 images-distclean: images-clean
 	$(foreach f,$(IMG_GENERATED),$(call rm-echo,$(f));)
+
 
 ###########
 # General #
@@ -340,7 +340,7 @@ export: compile
 ifeq (x,x$(EXPORT_DIR))
 	$(error EXPORT_DIR is not defined!)
 else
-	test -d "$(EXPORT_DIR)" || mkdir "$(EXPORT_DIR)"
+	test -d "$(EXPORT_DIR)" || mkdir -p "$(EXPORT_DIR)"
 	$(foreach f,$(DOCUMENTS),cp "$(f)" "$(EXPORT_DIR)/$(notdir $(f))";)
 	@$(MSG_BEGIN) Files exported to '$(EXPORT_DIR)' $(MSG_END)
 endif
@@ -351,9 +351,10 @@ endif
 
 FORCE: ; @true
 .PHONY: all clean clean-all compile depend distclean export \
+	help help-transformations \
 	images images-clean images-distclean \
 	latex latex-clean latex-distclean \
 	list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
 	.eps .glo .glg .idx .ind .java \
-	.pdf .plant .pic .png .svg .tex
+	.pdf .plant .pic .png .svg .tex .txt
