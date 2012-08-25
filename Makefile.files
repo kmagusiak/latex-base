@@ -15,6 +15,7 @@
 #DIA=dia
 #EXPORT_DIR=export
 #GRAPHVIZ_DOT=dot
+#LATEXMK=
 #PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 #PYTHON=python
 #UMLGRAPH_ARG=-private

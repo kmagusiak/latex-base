@@ -100,8 +100,11 @@ define pdf-latex-recompile # $1: tex file
 	grep -i -E '(There were undefined references|rerun to get)' \
 		"$*.log" $(NULL_OUTPUT)
 endef
-# Makes the bibliography file ($1: bib file)
-pdf-bibtex=bibtex "$(1:.bib=)" $(PDF_LATEX_REDIRECT)
+# Makes the bibliography file ($1: file without ext)
+pdf-bibtex=bibtex "$(1)" $(PDF_LATEX_REDIRECT)
+pdf-biber=biber "$(1)" $(PDF_LATEX_REDIRECT)
+pdf-biber-negtest=test ! -s "$(1).bcf" \
+	|| ! grep -i 'run Biber' "$(1).log" $(NULL_OUTPUT)
 # Makes the index file ($1: idx file)
 pdf-makeindex=makeindex "$(1)" $(PDF_LATEX_REDIRECT)
 # Makes the glossaries ($1: glo file)
@@ -222,9 +225,12 @@ latex: $(DOCUMENTS)
 ifeq (x,x$(LATEXMK))
 	@$(MSG_BEGIN) LaTeX compile: $* $(MSG_END)
 	$(call pdf-latex,$<)
-	test ! -s "$*.aux" \
-		|| ! grep -E '\\(cit|bib)' "$*.aux" $(NULL_OUTPUT) \
-		|| ($(MAKE) "$*.bbl"; echo "rerun to get the bibliography" >> "$*.log")
+	( \
+		( test ! -s "$*.aux" \
+		|| ! grep -E '\\(cit|bib)' "$*.aux" $(NULL_OUTPUT) ) \
+	&& \
+		( $(call pdf-biber-negtest,$*) ) \
+	) || ($(MAKE) "$*.bbl"; echo "rerun to get the bibliography" >> "$*.log")
 	test ! -s "$*.idx" \
 		|| ($(MAKE) "$*.ind"; echo "rerun to get the index" >> "$*.log")
 	!( test -s "$*.glo" || test -s "$*.acn" ) \
@@ -244,7 +250,8 @@ endif
 
 .aux.bbl:
 	@$(MSG_BEGIN) BibTeX compile: $* $(MSG_END)
-	$(call pdf-bibtex,$<)
+	$(call pdf-biber-negtest,$*) || $(call pdf-biber,$*)
+	test -f "$@" || $(call pdf-bibtex,$*)
 
 .idx.ind:
 	@$(MSG_BEGIN) makeindex: $* $(MSG_END)
@@ -259,7 +266,7 @@ ifneq (x,x$(LATEXMK))
 	$(call pdf-latexmk-clean,$*.tex)
 else
 	$(RM) $(foreach e,\
-		acn acr alg aux bbl blg fax glg glo gls idx ilg ind ist \
+		acn acr alg aux bbl bcf blg fax glg glo gls idx ilg ind ist \
 		lof log loh loi lot nav out snm tns toc vrb \
 		run.xml *.gnuplot *.table \
 		,$*.$(e)) $*-blx.bib
