@@ -20,6 +20,7 @@ Dependencies
 - python (for dependency generation)
 
 Optional dependencies:
+- biber
 - dia
 - gnuplot
 - graphviz
