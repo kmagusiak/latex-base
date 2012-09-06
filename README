@@ -5,7 +5,7 @@ latex-base package
 latex-base eases writing of LaTeX documents by providing a set of templates,
 examples and tools to build a PDF automatically.
 
-Most of the time, the use will use a copy of this project for another project
+Most of the time, the user will use a copy of this project for another project
 containing a set of documents. Additional templates may later be added back to
 this project and updates of this project should not break the compatibility.
 
