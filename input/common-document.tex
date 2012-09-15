@@ -11,7 +11,6 @@
 \usepackage{tabularx} % Tables (extended)
 
 \usepackage{enumitem} % For enumerations
-\usepackage{fancyhdr} % Headers and footers
 \usepackage{lastpage} % \pageref{LastPage} % Must be compiled 2 times!
 \usepackage{makeidx} % Index
 \usepackage{multirow} % Row spanning in tables
@@ -21,17 +20,17 @@
 \usepackage{wrapfig} % Wrapping text around figures
 
 %% Bibliography
-\usepackage[natbib=false
-	%,backend=biber
-	,backend=bibtex
-	%,sorting=none
-	]{biblatex}
+\input{input/bibliography}
 
 %% Glossaries
 \usepackage[acronym
 	%,description
 	%,footnote
 	]{glossaries}
+
+%% Header and footer
+\usepackage{fancyhdr} % Headers and footers
+\renewcommand{\headrulewidth}{0pt}
 
 %% Macros
 \input{input/macros}
