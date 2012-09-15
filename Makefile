@@ -35,6 +35,7 @@ endif
 INTERN_MAKE_DEPGEN=$(SCRIPT_DIR)/latex-depgen.py
 INTERN_MAKE_FILES=Makefile.files
 INTERN_MAKE_DEPS=Makefile.d
+INTERN_MAKE_GEN=Makefile.genlist
 
 ## Include dependencies
 #DOC_AUTOFIND=$(shell grep -l -m 1 -E '^\s*\\documentclass' *.tex )
@@ -88,6 +89,14 @@ define rm-echo-dir # $1: dirname
 		echo Remove directory: "$(1)"; \
 		$(RM) -r "$(1)"; \
 	)
+endef
+define log-generated # $1: filename
+	@echo "$1" >> $(INTERN_MAKE_GEN)
+endef
+define log-sort
+	sort -u $(INTERN_MAKE_GEN) > "$(INTERN_MAKE_GEN).sort" 2> /dev/null \
+		|| true
+	mv "$(INTERN_MAKE_GEN).sort" $(INTERN_MAKE_GEN)
 endef
 # Compiles a tex file into a pdf file
 define pdf-latex # $1: tex file
@@ -247,6 +256,7 @@ else
 	@$(MSG_BEGIN) LaTeXmk: $* $(MSG_END)
 	$(call pdf-latexmk,$<)
 endif
+	$(call log-generated,$@)
 
 .aux.bbl:
 	@$(MSG_BEGIN) BibTeX compile: $* $(MSG_END)
@@ -287,35 +297,42 @@ images: $(IMG_ALL)
 %.eps %.pdf %.png: %.dia
 	@$(MSG_BEGIN) Generating $@ from dia $(MSG_END)
 	( cd "$(dir $<)" && $(DIA) "--export=$(notdir $@)" "$(notdir $<)" )
+	$(call log-generated,$@)
 
 %.eps %.pdf %.png: %.dot
 	@$(MSG_BEGIN) Generating $@ from dot $(MSG_END)
 	( cd "$(dir $<)" && $(GRAPHVIZ_DOT) -T$(subst .,,$(suffix $@)) \
 		-o "$(notdir $@)" "$(notdir $<)" )
+	$(call log-generated,$@)
 
 %.dot: %.java
 	@$(MSG_BEGIN) Generating $@ from java $(MSG_END)
 	$(JAVADOC) -docletpath "$(UMLGRAPH_JAR)" \
 		-doclet org.umlgraph.doclet.UmlGraph \
 		-output "$@" $(UMLGRAPH_ARG) "$<"
+	$(call log-generated,$@)
 
 %.eps %.png: %.pdf
 	@$(MSG_BEGIN) Generating $@ from pdf $(MSG_END)
 	convert -density $(PDF_IMAGE_DENSITY)x$(PDF_IMAGE_DENSITY) "$<" "$@"
+	$(call log-generated,$@)
 
 %.png %.svg %.txt: %.plant
 	@$(MSG_BEGIN) Generating $@ from plant $(MSG_END)
 	cat "$<" | $(JAVA) -jar $(PLANTUML_JAR) \
 		-t$(subst .,,$(suffix $@)) -pipe > "$@"
+	$(call log-generated,$@)
 
 %.svg: %.pic
 	@$(MSG_BEGIN) Generating $@ from pic $(MSG_END)
 	( cd "$(SCRIPT_DIR)" && pic2plot -T$(subst .,,$(suffix $@)) \
 		"$(abspath $<)" > "$(abspath $@)" )
+	$(call log-generated,$@)
 
 %.eps %.pdf %.png: %.svg
 	@$(MSG_BEGIN) Generating $@ from svg $(MSG_END)
 	$(call svg-convert,$<,$@)
+	$(call log-generated,$@)
 
 images-clean:
 	$(foreach f, $(filter %.tex, $(IMG_SRC)), \
@@ -333,10 +350,11 @@ images-distclean: images-clean
 
 compile_clean: compile
 	@$(MSG_BEGIN) Cleaning... $(MSG_END)
-	$(MAKE) clean
+	$(MAKE) -j clean
 
 compile: images latex
 	@$(MSG_BEGIN) All the files has been compiled. $(MSG_END)
+	$(call log-sort)
 
 clean: images-clean latex-clean
 
@@ -351,6 +369,9 @@ clean-all: distclean
 ifneq (x,x$(IMG_ROOT_DIR))
 	$(RM) $(IMG_ROOT_DIR)/*~
 endif
+	$(call log-sort)
+	xargs --arg-file $(INTERN_MAKE_GEN) -I '{}' $(RM) '{}'
+	$(RM) $(INTERN_MAKE_GEN)
 
 list:
 	@echo "# PDF files"
@@ -359,6 +380,9 @@ list:
 	@$(foreach f, $(IMG_GENERATED), echo "$f";)
 	@echo "# Static images"
 	@$(foreach f, $(IMG_STATIC), echo "$f";)
+	@echo "# All created files"
+	@$(call log-sort)
+	@cat $(INTERN_MAKE_GEN)
 
 export: compile
 ifeq (x,x$(EXPORT_DIR))
