@@ -3,11 +3,16 @@ syntax: glob
 
 # Generated files
 Makefile.d
+Makefile.genlist
 *.pdf
 
 # Temporary LaTeX files
+*.acn
+*.acr
+*.alg
 *.aux
 *.bbl
+*.bcf
 *.blg
 *.fax
 *.fdb_latexmk
