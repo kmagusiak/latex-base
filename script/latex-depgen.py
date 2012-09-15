@@ -89,7 +89,7 @@ def getTexFileDepMatch(dep, line, regex,
 	# check the extension
 	if not isinstance(ext, list):
 		ext = [ext]
-		if extdef == '': extdef = ext[0]
+	if extdef == '': extdef = ext[0]
 	# find the files
 	fns = [ f + '.' + e for e in ext if e != '' ]
 	fns.append(f)
@@ -99,7 +99,7 @@ def getTexFileDepMatch(dep, line, regex,
 		f = found[0]
 	else:
 		# try to set the default extension
-		if extdef != '':
+		if extdef != '' and not f.endswith('.' + extdef):
 			f += '.' + extdef
 		if optional and not os.path.isfile(f):
 			return # nothing has been found
@@ -107,7 +107,7 @@ def getTexFileDepMatch(dep, line, regex,
 	if f in dep: return
 	dep.add(f)
 	# recursive?
-	if os.path.splitext(f)[1] == '.tex':
+	if f.endswith('.tex'):
 		getTexFileDep(f, dep)
 
 def latexLines(f):

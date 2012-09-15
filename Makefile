@@ -21,7 +21,7 @@ UMLGRAPH_ARG=-private
 UMLGRAPH_HOME=$(SCRIPT_DIR)
 UMLGRAPH_JAR=$(UMLGRAPH_HOME)/UmlGraph.jar
 VERBOSE=no
-VIEWER=evince
+VIEWER=$(shell which evince okular xpdf 2> /dev/null | head -n1)
 
 # For Java
 ifeq (x,x$(JAVA_HOME))
@@ -110,7 +110,7 @@ pdf-makeindex=makeindex "$(1)" $(PDF_LATEX_REDIRECT)
 # Makes the glossaries ($1: glo file)
 pdf-makeglossaries=makeglossaries "$(1:.glo=)" $(PDF_LATEX_REDIRECT)
 # Opens a pdf file ($1: pdf file)
-pdf-viewer=$(VIEWER) "$(1)" $(PDF_LATEX_REDIRECT)
+pdf-viewer="$(VIEWER)" "$(1)" $(PDF_LATEX_REDIRECT)
 # LaTeXmk ($1: tex file)
 define pdf-latexmk # $1: tex file
 	( cd "$(dir $(1))" && ( \
@@ -293,17 +293,13 @@ images: $(IMG_ALL)
 	( cd "$(dir $<)" && $(GRAPHVIZ_DOT) -T$(subst .,,$(suffix $@)) \
 		-o "$(notdir $@)" "$(notdir $<)" )
 
-.eps.pdf:
-	@$(MSG_BEGIN) Generating $@ from pdf $< $(MSG_END)
-	epspdf "$<" "$@"
-
-.java.dot:
+%.dot: %.java
 	@$(MSG_BEGIN) Generating $@ from java $(MSG_END)
 	$(JAVADOC) -docletpath "$(UMLGRAPH_JAR)" \
 		-doclet org.umlgraph.doclet.UmlGraph \
 		-output "$@" $(UMLGRAPH_ARG) "$<"
 
-.pdf.png:
+%.eps %.png: %.pdf
 	@$(MSG_BEGIN) Generating $@ from pdf $(MSG_END)
 	convert -density $(PDF_IMAGE_DENSITY)x$(PDF_IMAGE_DENSITY) "$<" "$@"
 
