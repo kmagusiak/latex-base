@@ -28,6 +28,7 @@ Optional dependencies:
 - latexmk
 - plantuml
 - plotutils
+- pygments
 - umlgraph (included)
 
 `make` described below may be used on the project to check if minimal

@@ -10,10 +10,6 @@ IMG_ROOT_DIR = 'img'
 IMG_EXT_NORMAL = ['eps', 'jpg', 'pdf', 'png']
 IMG_EXT_DEF = 'pdf'
 assert IMG_EXT_DEF in IMG_EXT_NORMAL
-LISTINGS_EXT = [
-	'c', 'cpp', 'erl', 'h', 'hs',
-	'idl', 'java', 'lsp', 'php',
-	'py', 'sh', 'tex']
 
 def getTexFileDep(filename, dep = None):
 	"""Generates dependencies for a tex file."""
@@ -66,10 +62,12 @@ def getTexFileDep(filename, dep = None):
 				'\\\\pgfdeclareimage' + match_opt
 					+ match_arg_ignore + match_arg,
 				ext = IMG_EXT_NORMAL, extdef = IMG_EXT_DEF)
+			# inputminted
+			getTexFileDepMatch(dep, line,
+				'\\\\inputminted' + match_arg_ignore + match_arg)
 			# lstinputlisting
 			getTexFileDepMatch(dep, line,
-				'\\\\lstinputlisting' + match_opt_arg,
-				ext = LISTINGS_EXT)
+				'\\\\lstinputlisting' + match_opt_arg)
 			# -------------------------------
 	return dep
 
