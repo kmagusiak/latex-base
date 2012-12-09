@@ -12,7 +12,7 @@ import sys
 def prompt(message='Input:', choice=None, default=None):
 	""" Prompts a user to enter some text."""
 	while True:
-		response = raw_input(message + ' ')
+		response = input(message + ' ')
 		if choice is not None:
 			response = response.lower()
 			if (len(response) == 0
