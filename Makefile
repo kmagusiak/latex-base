@@ -104,7 +104,12 @@ endef
 define pandoc-tex # $1: input file
 	# fix for enumitem and using listings style
 	$(PANDOC) $(PANDOC_FLAGS) --listings -t latex "$(1)" \
-		| sed -r 's/(begin\{enumerate})\[1\.]/\1/' \
+		| sed -r 's/(begin\{enumerate})\[(.)?1(.)?]/\1[label=\2\\arabic*\3]/' \
+		| sed -r 's/(begin\{enumerate})\[(.)?a(.)?]/\1[label=\2\\alph*\3]/' \
+		| sed -r 's/(begin\{enumerate})\[(.)?A(.)?]/\1[label=\2\\Alph*\3]/' \
+		| sed -r 's/(begin\{enumerate})\[(.)?i(.)?]/\1[label=\2\\roman*\3]/' \
+		| sed -r 's/(begin\{enumerate})\[(.)?I(.)?]/\1[label=\2\\Roman*\3]/' \
+		| sed -r 's/(begin\{enumerate})\[.{1,3}]/\1/' \
 		| sed -r 's/(begin\{lstlisting})\[language=(\w+)]/\1\[style=\2]/' \
 		> "$(basename $(1)).tex"
 endef
