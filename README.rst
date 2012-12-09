@@ -77,14 +77,14 @@ The script ``latex-base-clone.py`` can be used to generate and update user's
 files in other projects.  The used script is the one located in the *cloned*
 directory, not the current one.
 
- * Initializing a new project
-   To create a new clone use ``init PATH`` where ``PATH`` is the name of the
-   directory to create.
- * Updating an existing project
-   Go to the destination directory and run the script with ``update``.
- * Copying/updating a template
-   Go to the destination directory and run the script with ``template``.
-   Optionally, add a name of the template to copy/update.
+- Initializing a new project
+  To create a new clone use ``init PATH`` where ``PATH`` is the name of the
+  directory to create.
+- Updating an existing project
+  Go to the destination directory and run the script with ``update``.
+- Copying/updating a template
+  Go to the destination directory and run the script with ``template``.
+  Optionally, add a name of the template to copy/update.
 
 Editing files
 -------------
@@ -130,13 +130,23 @@ Useful links and tutorials
 ==========================
 
 - LaTeX Wikibooks
+
   http://en.wikibooks.org/wiki/LaTeX
+
 - Andy Robert's tutorial
+
   http://www.andy-roberts.net/misc/latex/
+
 - List of LaTeX commands
+
   http://www.emerson.emory.edu/services/latex/latex_toc.html
+
 - Beamer Guide
+
   http://www.scribd.com/doc/28011/beamer-guide
+
 - The Comprehensive LaTeX Symbol list
+
   http://www.ctan.org/tex-archive/info/symbols/comprehensive/symbols-a4.pdf
+
 - The Not So Short Introduction to LATEX2e
