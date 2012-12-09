@@ -10,6 +10,7 @@ all: compile_clean
 
 # Variables and commands
 DIA=dia
+DOCUTILS_TEX=rst2latex.py
 GRAPHVIZ_DOT=dot
 LATEXMK=$(shell which latexmk 2> /dev/null)
 PANDOC=pandoc
@@ -304,18 +305,23 @@ latex-clean: $(DOC:.tex=.tex.clean)
 latex-distclean: latex-clean
 	$(foreach f,$(DOCUMENTS),$(call rm-echo,$(f));)
 
-##########
-# Pandoc #
-##########
+###################
+# Other documents #
+###################
 
 %.pdf: %.md
-	@$(MSG_BEGIN) Generating $@ using pandoc (markdown) $(MSG_END)
+	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
 	$(PANDOC) $(PANDOC_FLAGS) -o "$@" "$<"
 	$(call log-generated,$@)
 
 %.tex: %.md
-	@$(MSG_BEGIN) Generating $@ using pandoc (markdown) $(MSG_END)
+	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
 	$(call pandoc-tex,$<)
+	$(call log-generated,$@)
+
+%.tex: %.rst
+	@$(MSG_BEGIN) Generating $@ using docutils $(MSG_END)
+	$(DOCUTILS_TEX) "$<" "$@"
 	$(call log-generated,$@)
 
 ####################
@@ -435,4 +441,4 @@ FORCE: ; @true
 	list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
 	.eps .glo .glg .idx .ind .java .md \
-	.pdf .plant .pic .png .svg .tex .txt
+	.pdf .plant .pic .png .rst .svg .tex .txt
