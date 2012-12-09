@@ -41,17 +41,21 @@ INTERN_MAKE_DEPS=Makefile.d
 INTERN_MAKE_GEN=Makefile.genlist
 
 ## Include dependencies
-#DOC_AUTOFIND=$(shell grep -l -m 1 -E '^\s*\\documentclass' *.tex )
-DOC_AUTOFIND=$(shell for f in $$(ls *.tex 2> /dev/null ); do \
+DOC_AUTOFIND=\
+	$(shell for f in $$(ls *.tex 2> /dev/null); do \
 	awk '/^\s*\\documentclass/ { print FILENAME } /^\s*($$|%)/ {next} {exit}' \
-	"$$f"; done )
+	"$$f"; done ) \
+	$(shell for f in $$(ls *.md 2> /dev/null); do \
+	grep -m1 -E '^\S' "$$f" | grep -E '^%' > /dev/null && echo "$$f"; \
+	done ) \
+	$(shell echo $$(ls *.rst 2> /dev/null))
 DOC=$(DOC_AUTOFIND)
-DOC_AUTODEP=$(DOC)
+DOC_AUTODEP=$(filter %.tex,$(DOC))
 -include $(INTERN_MAKE_FILES)
 -include $(INTERN_MAKE_DEPS)
 
 ## Derived files
-DOCUMENTS=$(DOC:.tex=.pdf)
+DOCUMENTS=$(patsubst %.md,%.pdf,$(patsubst %.rst,%.pdf,$(DOC:.tex=.pdf)))
 
 ## Images
 IMG_ROOT_DIR=$(shell test -d img && echo img)
@@ -190,18 +194,19 @@ help:
 	@echo "clean-all: same as distclean but removes also backup files"
 	@echo "compile: compiles the documents and the images"
 	@echo "depend: regenerates the Makefile.d"
+	@echo "documents: compiles the documents"
+	@echo "documents-clean: removes temporary files after compilation"
+	@echo "documents-distclean: removes the compiled documents"
 	@echo "distclean: removes all the generated files"
 	@echo "export: exports the pdfs to a directory"
 	@echo "help: this message"
 	@echo "help-transformations: prints the transformations"
+	@echo "latex-clean: removes temporary files after LaTeX compilation"
 	@echo "list: list all considered files"
 	@$(MSG_BEGIN) Type specific rules $(MSG_END)
 	@echo "images: compiles the images"
 	@echo "images-clean: removes temporary files after compilation"
 	@echo "images-distclean: removes compiled images"
-	@echo "latex: compiles the documents"
-	@echo "latex-clean: removes temporary files after compilation"
-	@echo "latex-distclean: removes the compiled documents"
 	@$(MSG_BEGIN) Generic rules $(MSG_END)
 	@echo "debug-%: shows the value of a variable"
 	@echo "%.pdf.view: compiles and opens a pdf file"
@@ -219,6 +224,7 @@ help-transformations:
 	@echo "pdf -> png (using imagemagick)"
 	@echo "pic -> svg (using plotutils)"
 	@echo "plant -> {png,svg} (using plantuml)"
+	@echo "rst -> tex (using docutils)"
 	@echo "svg -> {eps,pdf,png} (using inkscape or imagemagick)"
 	@echo "tex -> pdf (using pdflatex)"
 
@@ -241,8 +247,6 @@ endif
 ###################
 # Compiling LaTeX #
 ###################
-
-latex: $(DOCUMENTS)
 
 %.pdf.view: %.pdf
 	$(call pdf-viewer,$*.pdf)
@@ -302,12 +306,17 @@ endif
 latex-clean: $(DOC:.tex=.tex.clean)
 	$(RM) *.aux
 
-latex-distclean: latex-clean
-	$(foreach f,$(DOCUMENTS),$(call rm-echo,$(f));)
-
 ###################
 # Other documents #
 ###################
+
+documents: $(DOCUMENTS)
+
+documents-clean: latex-clean
+
+documents-distclean: documents-clean
+	$(foreach f,$(DOCUMENTS),$(call rm-echo,$(f));)
+
 
 %.pdf: %.md
 	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
@@ -329,6 +338,16 @@ latex-distclean: latex-clean
 ####################
 
 images: $(IMG_ALL)
+
+images-clean:
+	$(foreach f, $(filter %.tex, $(IMG_SRC)), \
+		$(MAKE) "$(f).clean"; )
+ifneq (x,x$(IMG_ROOT_DIR))
+	find "$(IMG_ROOT_DIR)" -name "*-eps-converted-to.pdf" | xargs $(RM)
+endif
+
+images-distclean: images-clean
+	$(foreach f,$(IMG_GENERATED),$(call rm-echo,$(f));)
 
 %.eps %.pdf %.png: %.dia
 	@$(MSG_BEGIN) Generating $@ from dia $(MSG_END)
@@ -370,16 +389,6 @@ images: $(IMG_ALL)
 	$(call svg-convert,$<,$@)
 	$(call log-generated,$@)
 
-images-clean:
-	$(foreach f, $(filter %.tex, $(IMG_SRC)), \
-		$(MAKE) "$(f).clean"; )
-ifneq (x,x$(IMG_ROOT_DIR))
-	find "$(IMG_ROOT_DIR)" -name "*-eps-converted-to.pdf" | xargs $(RM)
-endif
-
-images-distclean: images-clean
-	$(foreach f,$(IMG_GENERATED),$(call rm-echo,$(f));)
-
 ###########
 # General #
 ###########
@@ -388,13 +397,13 @@ compile_clean: compile
 	@$(MSG_BEGIN) Cleaning... $(MSG_END)
 	$(MAKE) -j clean
 
-compile: images latex
+compile: images documents
 	@$(MSG_BEGIN) All the files has been compiled. $(MSG_END)
 	$(call log-sort)
 
-clean: images-clean latex-clean
+clean: images-clean documents-clean
 
-distclean: images-distclean latex-distclean
+distclean: images-distclean documents-distclean
 ifneq (x,x$(EXPORT_DIR))
 	$(call rm-echo-dir,"$(EXPORT_DIR)")
 endif
@@ -434,11 +443,11 @@ endif
 ###########################
 
 FORCE: ; @true
-.PHONY: all clean clean-all compile depend distclean export \
-	help help-transformations \
+.PHONY: all clean clean-all compile depend distclean \
+	documents documents-clean documents-distclean \
+	export help help-transformations \
 	images images-clean images-distclean \
-	latex latex-clean latex-distclean \
-	list
+	latex-clean list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
 	.eps .glo .glg .idx .ind .java .md \
 	.pdf .plant .pic .png .rst .svg .tex .txt
