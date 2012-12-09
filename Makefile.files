@@ -13,6 +13,7 @@
 
 ## Environment variables
 #DIA=dia
+#DOCUTILS_TEX=rst2latex.py
 #EXPORT_DIR=export
 #GRAPHVIZ_DOT=dot
 #LATEXMK=
