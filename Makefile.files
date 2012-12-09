@@ -16,6 +16,8 @@
 #EXPORT_DIR=export
 #GRAPHVIZ_DOT=dot
 #LATEXMK=
+#PANDOC=pandoc
+#PANDOC_FLAGS=--smart
 #PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 #PYTHON=python
 #UMLGRAPH_ARG=-private

@@ -12,6 +12,8 @@ all: compile_clean
 DIA=dia
 GRAPHVIZ_DOT=dot
 LATEXMK=$(shell which latexmk 2> /dev/null)
+PANDOC=pandoc
+PANDOC_FLAGS=--smart
 PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 PYTHON=python
 RM=rm -f
@@ -97,6 +99,14 @@ define log-sort
 	sort -u $(INTERN_MAKE_GEN) > "$(INTERN_MAKE_GEN).sort" 2> /dev/null \
 		|| true
 	mv "$(INTERN_MAKE_GEN).sort" $(INTERN_MAKE_GEN)
+endef
+# Builds a tex file using pandoc
+define pandoc-tex # $1: input file
+	# fix for enumitem and using listings style
+	$(PANDOC) $(PANDOC_FLAGS) --listings -t latex "$(1)" \
+		| sed -r 's/(begin\{enumerate})\[1\.]/\1/' \
+		| sed -r 's/(begin\{lstlisting})\[language=(\w+)]/\1\[style=\2]/' \
+		> "$(basename $(1)).tex"
 endef
 # Compiles a tex file into a pdf file
 define pdf-latex # $1: tex file
@@ -199,6 +209,7 @@ help-transformations:
 	@echo "dot -> {eps,pdf,png} (using graphviz)"
 	@echo "eps -> pdf (using epspdf)"
 	@echo "java -> dot (using UmlGraph)"
+	@echo "md -> {tex,pdf} (using pandoc)"
 	@echo "pdf -> png (using imagemagick)"
 	@echo "pic -> svg (using plotutils)"
 	@echo "plant -> {png,svg} (using plantuml)"
@@ -287,6 +298,20 @@ latex-clean: $(DOC:.tex=.tex.clean)
 
 latex-distclean: latex-clean
 	$(foreach f,$(DOCUMENTS),$(call rm-echo,$(f));)
+
+##########
+# Pandoc #
+##########
+
+%.pdf: %.md
+	@$(MSG_BEGIN) Generating $@ using pandoc (markdown) $(MSG_END)
+	$(PANDOC) $(PANDOC_FLAGS) -o "$@" "$<"
+	$(call log-generated,$@)
+
+%.tex: %.md
+	@$(MSG_BEGIN) Generating $@ using pandoc (markdown) $(MSG_END)
+	$(call pandoc-tex,$<)
+	$(call log-generated,$@)
 
 ####################
 # Image generation #
@@ -404,5 +429,5 @@ FORCE: ; @true
 	latex latex-clean latex-distclean \
 	list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
-	.eps .glo .glg .idx .ind .java \
+	.eps .glo .glg .idx .ind .java .md \
 	.pdf .plant .pic .png .svg .tex .txt
