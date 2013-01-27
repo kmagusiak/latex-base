@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# Quick LaTeX file dependency generator
-#  - parses tex files
-#  - extended for markdown
+# Quick document file dependency generator:
+#  - parses LaTeX files
+#  - parses markdown
 
 import os.path
 import re
@@ -167,7 +167,7 @@ def writeDeps(out, deps, suffix = ''):
 	out.write(suffix)
 
 def writeDependencies(out, filename, deps, outext = 'pdf'):
-	"""Write dependencies for a tex file"""
+	"""Write dependencies for a file"""
 	genfile = os.path.splitext(filename)[0] + '.' + outext
 	if genfile == filename:
 		sys.stderr.write("No dependencies writen for %s\n" % filename)
