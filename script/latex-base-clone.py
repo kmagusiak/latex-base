@@ -196,8 +196,8 @@ def list_templates(directory):
 			cwd=directory,
 			stdout=subprocess.PIPE)
 	p.poll()
-	result = p.communicate()[0]
-	for line in result.split("\n"):
+	result = p.communicate()[0].decode("utf-8")
+	for line in result.splitlines():
 		if not line.startswith("DOC="): continue
 		return re.split('\\s+', line[4:].strip())
 	return [] # not found
@@ -222,7 +222,7 @@ def update_template(name, dest, src, deps=None):
 		print('')
 		# Update dependencies
 		for d in read_make_files(os.path.join(src, 'Makefile.d'),
-			name.replace('.tex', '.pdf') + ':'):
+			os.path.splitext(name)[0] + '.pdf:'):
 			if d == name: continue
 			file_update(os.path.join(dest, d), os.path.join(src, d))
 
