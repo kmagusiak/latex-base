@@ -138,13 +138,13 @@ def update_files(dest, src):
 	# Files
 	for f in ['Makefile']:
 		file_update(os.path.join(dest, f), os.path.join(src, f))
-	# dir: input
-	f = 'input'
-	dir_update(os.path.join(dest, f), os.path.join(src, f),
+	# Optional directories
+	for f in ['input']:
+		dir_update(os.path.join(dest, f), os.path.join(src, f),
 			optional=True, ask=True)
-	# file: Makefile.files
-	f = 'Makefile.files'
-	file_update(os.path.join(dest, f), os.path.join(src, f),
+	# Optional files
+	for f in ['Makefile.files', '.gitignore', '.hgignore']:
+		file_update(os.path.join(dest, f), os.path.join(src, f),
 			only_create=True, optional=True)
 
 def read_make_files(filename, prefix):
