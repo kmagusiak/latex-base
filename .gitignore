@@ -1,5 +1,4 @@
 ## latex-base: ignored files
-syntax: glob
 
 # Generated files
 Makefile.d
