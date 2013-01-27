@@ -15,6 +15,7 @@ GRAPHVIZ_DOT=dot
 LATEXMK=$(shell which latexmk 2> /dev/null)
 PANDOC=pandoc
 PANDOC_FLAGS=--smart
+PANDOC_PDF_FLAGS=$(PANDOC_FLAGS) --toc --number-sections
 PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 PYTHON=python
 RM=rm -f
@@ -117,7 +118,7 @@ define markdown-stream # $1: root file
 endef
 # Builds a pdf using pandoc
 define pandoc-pdf # $1: output file; $2: pandoc args
-	$(PANDOC) $(PANDOC_FLAGS) -o "$(1)" $(2)
+	$(PANDOC) $(PANDOC_PDF_FLAGS) -o "$(1)" $(2)
 endef
 # Builds a tex file using pandoc
 # Contains:
