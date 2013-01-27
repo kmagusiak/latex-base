@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # Quick LaTeX file dependency generator
+#  - parses tex files
+#  - extended for markdown
 
 import os.path
 import re
@@ -10,12 +12,13 @@ IMG_ROOT_DIR = 'img'
 IMG_EXT_NORMAL = ['eps', 'jpg', 'pdf', 'png']
 IMG_EXT_DEF = 'pdf'
 assert IMG_EXT_DEF in IMG_EXT_NORMAL
+MD_EXT = ['md', 'markdown', 'mkdn', 'mdown']
 
-def getTexFileDep(filename, dep = None):
+# =========================================================
+
+def getTexFileDep(filename, dep):
 	"""Generates dependencies for a tex file."""
 	# check the arguments
-	if dep is None:
-		dep = set()
 	if os.path.splitext(filename)[1] != '.tex':
 		sys.stderr.write("getTexFileDep(%s): works only for tex files\n"
 			% filename)
@@ -69,7 +72,6 @@ def getTexFileDep(filename, dep = None):
 			getTexFileDepMatch(dep, line,
 				'\\\\lstinputlisting' + match_opt_arg)
 			# -------------------------------
-	return dep
 
 def getTexFileDepMatch(dep, line, regex,
 		ext = '', extdef = '', dir = '',
@@ -104,9 +106,7 @@ def getTexFileDepMatch(dep, line, regex,
 	# add the file
 	if f in dep: return
 	dep.add(f)
-	# recursive?
-	if f.endswith('.tex'):
-		getTexFileDep(f, dep)
+	getFileDep(f, dep)
 
 def latexLines(f):
 	"""Generator for relevant latex lines (without comments or spaces)."""
@@ -128,6 +128,31 @@ def latexLines(f):
 	if not result:
 		yield acc
 
+# =========================================================
+
+def getMdFileDep(filename, dep):
+	"""Generates markdown file dependencies"""
+	if os.path.splitext(filename)[1] not in ['.' + ext for ext in MD_EXT]:
+		sys.stderr.write("getMdFileDep(%s): works only for markdown files\n"
+			% filename)
+		return dep
+	if not os.path.isfile(filename):
+		sys.stderr.write("getMdFileDep(%s): file does not exist\n"
+			% filename)
+		return dep
+	# analyse the lines of the given file
+	with open(filename, 'r') as f:
+		for line in f:
+			# an example of reference: ![some text](url "optional description")
+			m = re.search('!\[[^]]+\]\(([^)]+)(?:\s["\'].*["\'])?\)', line)
+			if m is None: continue
+			ref = m.group(1)
+			if ref in dep: continue
+			dep.add(ref)
+			getFileDep(ref, dep)
+
+# =========================================================
+
 def writeDep(out, dep):
 	"""Writes a dependency file"""
 	if ' ' in dep:
@@ -141,15 +166,31 @@ def writeDeps(out, deps, suffix = ''):
 		writeDep(out, d)
 	out.write(suffix)
 
-def writeDependencies(out, file, deps, outext = 'pdf'):
+def writeDependencies(out, filename, deps, outext = 'pdf'):
 	"""Write dependencies for a tex file"""
-	genfile = file.replace('.tex', '.' + outext)
-	if genfile == file: return
-	out.write("# Generated for %s\n" % file)
+	genfile = os.path.splitext(filename)[0] + '.' + outext
+	if genfile == filename:
+		sys.stderr.write("No dependencies writen for %s\n" % filename)
+		return
+	out.write("# Generated for %s\n" % filename)
 	writeDep(out, genfile)
 	out.write(': ')
-	writeDep(out, file)
+	writeDep(out, filename)
 	writeDeps(out, deps, suffix = "\n\n")
+
+def getFileDep(filename, dep = None):
+	noResult = dep
+	if dep is None:
+		dep = set()
+	if filename.endswith('.tex'):
+		getTexFileDep(filename, dep)
+	elif os.path.splitext(filename)[1] in ['.' + ext for ext in MD_EXT]:
+		getMdFileDep(filename, dep)
+	else:
+		return noResult
+	return dep
+
+# =========================================================
 
 if __name__ == '__main__':
 	"""The main program."""
@@ -160,12 +201,15 @@ if __name__ == '__main__':
 	out.write("\n")
 	dd = set()
 	for file in sys.argv[1:]:
-		d = getTexFileDep(file)
+		d = getFileDep(file)
+		if d is None:
+			sys.stderr.write("Unsupported file: %s" % file)
+			continue
 		writeDependencies(out, file, d)
 		dd |= set(d)
 		dd.add(file)
 	accept = lambda f: (os.path.splitext(f)[1] in
-		['.' + ext for ext in ['bib', 'cls', 'tex']])
+		['.' + ext for ext in ['bib', 'cls', 'tex'] + MD_EXT])
 	dd = set(filter(accept, dd))
 	out.write("# Dependencies of this file\nMakefile.d:")
 	out.write(" " + GEN_FROM)
