@@ -45,17 +45,23 @@ DOC_AUTOFIND=\
 	$(shell for f in $$(ls *.tex 2> /dev/null); do \
 	awk '/^\s*\\documentclass/ { print FILENAME } /^\s*($$|%)/ {next} {exit}' \
 	"$$f"; done ) \
-	$(shell for f in $$(ls *.md 2> /dev/null); do \
+	$(shell for f in $$(ls *.{md,markdown,mkdn,mdown} 2> /dev/null); do \
 	grep -m1 -E '^\S' "$$f" | grep -E '^%' > /dev/null && echo "$$f"; \
 	done ) \
 	$(shell echo $$(ls *.rst 2> /dev/null))
 DOC=$(DOC_AUTOFIND)
-DOC_AUTODEP=$(filter %.tex,$(DOC))
+DOC_AUTODEP=$(filter %.tex %.md %.markdown %.mkdn %.mdown,$(DOC))
 -include $(INTERN_MAKE_FILES)
 -include $(INTERN_MAKE_DEPS)
 
 ## Derived files
-DOCUMENTS=$(patsubst %.md,%.pdf,$(patsubst %.rst,%.pdf,$(DOC:.tex=.pdf)))
+DOCUMENTS=$(patsubst %.rst,%.pdf,\
+          $(patsubst %.md,%.pdf,\
+          $(patsubst %.markdown,%.pdf,\
+          $(patsubst %.mkdn,%.pdf,\
+          $(patsubst %.mdown,%.pdf,\
+          $(DOC:.tex=.pdf) \
+          )))))
 
 ## Images
 IMG_ROOT_DIR=$(shell test -d img && echo img)
@@ -104,6 +110,10 @@ define log-sort
 	sort -u $(INTERN_MAKE_GEN) > "$(INTERN_MAKE_GEN).sort" 2> /dev/null \
 		|| true
 	mv "$(INTERN_MAKE_GEN).sort" $(INTERN_MAKE_GEN)
+endef
+# Streams markdown concatenated document
+define markdown-stream # $1: root file
+	$(PYTHON) "$(SCRIPT_DIR)/markdown-stream.py" "$(1)"
 endef
 # Builds a pdf using pandoc
 define pandoc-pdf # $1: output file; $2: pandoc args
@@ -325,18 +335,21 @@ documents-distclean: documents-clean
 
 %.pdf: %.md
 	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
-	$(call pandoc-pdf,$@,"$<")
+	$(call markdown-stream,$<) | $(call pandoc-pdf,$@,)
 	$(call log-generated,$@)
 
 %.tex: %.md
 	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
-	$(call pandoc-tex,$@,"$<")
+	$(call markdown-stream,$<) | $(call pandoc-tex,$@,)
 	$(call log-generated,$@)
 
 %.md: %.markdown
 	cp "$<" "$@"
 
 %.md: %.mkdn
+	cp "$<" "$@"
+
+%.md: %.mdown
 	cp "$<" "$@"
 
 %.tex: %.rst
@@ -461,5 +474,5 @@ FORCE: ; @true
 	latex-clean list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
 	.eps .glo .glg .idx .ind .java \
-	.md .markdown .mkdn \
+	.md .markdown .mkdn .mdown \
 	.pdf .plant .pic .png .rst .svg .tex .txt
