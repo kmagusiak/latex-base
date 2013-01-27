@@ -105,10 +105,16 @@ define log-sort
 		|| true
 	mv "$(INTERN_MAKE_GEN).sort" $(INTERN_MAKE_GEN)
 endef
+# Builds a pdf using pandoc
+define pandoc-pdf # $1: output file; $2: pandoc args
+	$(PANDOC) $(PANDOC_FLAGS) -o "$(1)" $(2)
+endef
 # Builds a tex file using pandoc
-define pandoc-tex # $1: input file
-	# fix for enumitem and using listings style
-	$(PANDOC) $(PANDOC_FLAGS) --listings -t latex "$(1)" \
+# Contains:
+#  fix for enumitem package
+#  uses listings package
+define pandoc-tex # $1: output file; $2: pandoc args
+	$(PANDOC) $(PANDOC_FLAGS) --listings -t latex $(2) \
 		| sed -r 's/(begin\{enumerate})\[(.)?1(.)?]/\1[label=\2\\arabic*\3]/' \
 		| sed -r 's/(begin\{enumerate})\[(.)?a(.)?]/\1[label=\2\\alph*\3]/' \
 		| sed -r 's/(begin\{enumerate})\[(.)?A(.)?]/\1[label=\2\\Alph*\3]/' \
@@ -116,7 +122,7 @@ define pandoc-tex # $1: input file
 		| sed -r 's/(begin\{enumerate})\[(.)?I(.)?]/\1[label=\2\\Roman*\3]/' \
 		| sed -r 's/(begin\{enumerate})\[.{1,3}]/\1/' \
 		| sed -r 's/(begin\{lstlisting})\[language=(\w+)]/\1\[style=\2]/' \
-		> "$(basename $(1)).tex"
+		> "$(1)"
 endef
 # Compiles a tex file into a pdf file
 define pdf-latex # $1: tex file
@@ -317,16 +323,21 @@ documents-clean: latex-clean
 documents-distclean: documents-clean
 	$(foreach f,$(DOCUMENTS),$(call rm-echo,$(f));)
 
-
 %.pdf: %.md
 	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
-	$(PANDOC) $(PANDOC_FLAGS) -o "$@" "$<"
+	$(call pandoc-pdf,$@,"$<")
 	$(call log-generated,$@)
 
 %.tex: %.md
 	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
-	$(call pandoc-tex,$<)
+	$(call pandoc-tex,$@,"$<")
 	$(call log-generated,$@)
+
+%.md: %.markdown
+	cp "$<" "$@"
+
+%.md: %.mkdn
+	cp "$<" "$@"
 
 %.tex: %.rst
 	@$(MSG_BEGIN) Generating $@ using docutils $(MSG_END)
@@ -449,5 +460,6 @@ FORCE: ; @true
 	images images-clean images-distclean \
 	latex-clean list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
-	.eps .glo .glg .idx .ind .java .md \
+	.eps .glo .glg .idx .ind .java \
+	.md .markdown .mkdn \
 	.pdf .plant .pic .png .rst .svg .tex .txt
