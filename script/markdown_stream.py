@@ -10,9 +10,13 @@ import sys
 
 MD_EXT = ['md', 'markdown', 'mkdn', 'mdown']
 
-def copy_markdown(out, filename, copyHeader = True):
+def copy_markdown(out, filename, copyHeader=False,
+		recursion=None, ext=MD_EXT,
+		err=sys.stderr):
 	""" Copies the markdown file to the output stream """
-	sys.stderr.write("Reading markdown: %s\n" % filename)
+	err.write("Reading markdown: %s\n" % filename)
+	if recursion is None:
+		recursion = copy_markdown
 	try:
 		with open(filename, 'r') as f:
 			header = not copyHeader
@@ -27,14 +31,14 @@ def copy_markdown(out, filename, copyHeader = True):
 					m = re.search('!\[[^]]+\]\(([^)]+)(?:\s["\'].*["\'])?\)', line)
 				if m is not None:
 					ref = m.group(1)
-					if os.path.splitext(ref)[1] in ['.' + ext for ext in MD_EXT]:
+					if os.path.splitext(ref)[1] in ['.' + ext for ext in ext]:
 						out.write(line[:m.start()])
-						copy_markdown(out, ref, False)
+						recursion(out, ref)
 						out.write(line[m.end():])
 						continue
 				out.write(line)
 	except IOError as e:
-		sys.stderr.write("IOError when reading: %s\n" % filename)
+		err.write("IOError when reading: %s\n" % filename)
 		out.write(str(e))
 
 if __name__ == '__main__':

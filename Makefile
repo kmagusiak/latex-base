@@ -114,7 +114,7 @@ define log-sort
 endef
 # Streams markdown concatenated document
 define markdown-stream # $1: root file
-	$(PYTHON) "$(SCRIPT_DIR)/markdown-stream.py" "$(1)"
+	$(PYTHON) "$(SCRIPT_DIR)/markdown_stream.py" "$(1)"
 endef
 # Builds a pdf using pandoc
 define pandoc-pdf # $1: output file; $2: pandoc args
