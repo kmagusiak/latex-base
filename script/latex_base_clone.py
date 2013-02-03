@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-# Script for merging latex-base directories
+"""
+Script for merging latex-base directories
+"""
 
 import hashlib
 import os
@@ -12,7 +14,8 @@ import sys
 def prompt(message='Input:', choice=None, default=None):
 	""" Prompts a user to enter some text."""
 	while True:
-		response = input(message + ' ')
+		print(message, end=' ')
+		response = sys.stdin.readline()
 		if choice is not None:
 			response = response.lower()
 			if (len(response) == 0
@@ -46,24 +49,25 @@ def confirm(message='Confirm?', default=None):
 
 def get_base_directory():
 	""" Gets the root directory where the files are located (BASE) """
-	d = os.path.dirname(sys.argv[0])
-	d = os.path.join(d, '..')
-	d = os.path.normpath(d)
-	return d
+	path = os.path.dirname(sys.argv[0])
+	path = os.path.join(path, '..')
+	path = os.path.normpath(path)
+	return path
 
 def hash_file(path):
 	""" Returns a hash of a file. """
-	with open(path, 'rb') as fp:
-		return hashlib.md5(fp.read()).hexdigest()
+	with open(path, 'rb') as f:
+		return hashlib.md5(f.read()).hexdigest()
 
-# ------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 class AbortException(Exception):
 	""" Used inside this script to signal aborting. """
 	def __init__(self, message='Aborted'):
-		super(Exception, self).__init__(message)
+		Exception.__init__(self, message)
 
 def dir_update(dest, recursive_src=None, optional=False, ask=False):
+	""" Updates a directory. """
 	if not os.path.isdir(recursive_src) and optional:
 		return
 	if not os.path.isdir(dest):
@@ -149,10 +153,10 @@ def update_files(dest, src):
 
 def read_make_files(filename, prefix):
 	""" Reads files from a Makefile file which are entered as dependencies """
-	with open(filename, 'r') as fp:
-		return read_make_files_all(fp, prefix)[0]
+	with open(filename, 'r') as f:
+		return read_make_files_all(f, prefix)[0]
 
-def read_make_files_all(fp, prefix):
+def read_make_files_all(f, prefix):
 	"""
 	Reads files from a Makefile file prefixed by a variable name.
 	Returns a tuple with: (files, lines_before, lines_after)
@@ -161,7 +165,7 @@ def read_make_files_all(fp, prefix):
 	lines_before = []
 	lines_after = []
 	files = []
-	for line in fp:
+	for line in f:
 		if reading == 1:
 			pass
 		elif line.startswith(prefix):
@@ -178,25 +182,25 @@ def read_make_files_all(fp, prefix):
 		if line[-1:] == "\\":
 			cont = True
 			line = line.rstrip("\\")
-		fn = ''
-		for e in line.split():
-			fn += e
-			if fn[-1:] == "\\":
-				fn = fn[:len(fn) - 1] + ' '
+		fname = ''
+		for n in line.split():
+			fname += n
+			if fname[-1:] == "\\":
+				fname = fname[:len(fname) - 1] + ' '
 			else:
-				files.append(fn)
-				fn = ''
+				files.append(fname)
+				fname = ''
 		if not cont:
 			reading = 2
 	return (files, lines_before, lines_after)
 
 def list_templates(directory):
 	""" Lists template files declared in Makefile.files """
-	p = subprocess.Popen(['make', 'debug-DOC'],
+	proc = subprocess.Popen(['make', 'debug-DOC'],
 			cwd=directory,
 			stdout=subprocess.PIPE)
-	p.poll()
-	result = p.communicate()[0].decode("utf-8")
+	proc.poll()
+	result = proc.communicate()[0].decode("utf-8")
 	for line in result.splitlines():
 		if not line.startswith("DOC="): continue
 		return re.split('\\s+', line[4:].strip())
@@ -221,14 +225,15 @@ def update_template(name, dest, src, deps=None):
 		subprocess.check_call(['make', 'depend'], cwd=src)
 		print('')
 		# Update dependencies
-		for d in read_make_files(os.path.join(src, 'Makefile.d'),
+		for path in read_make_files(os.path.join(src, 'Makefile.d'),
 			os.path.splitext(name)[0] + '.pdf:'):
-			if d == name: continue
-			file_update(os.path.join(dest, d), os.path.join(src, d))
+			if path == name: continue
+			file_update(os.path.join(dest, path), os.path.join(src, path))
 
-# ------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 def command_init(path='', base=get_base_directory()):
+	""" Command: init """
 	path = os.path.join(os.getcwd(), path)
 	exists = os.path.exists(path)
 	if (exists and
@@ -240,17 +245,19 @@ def command_init(path='', base=get_base_directory()):
 	print('Done.')
 
 def command_update(base=get_base_directory()):
+	""" Command: update """
 	path = os.getcwd()
 	check_latex_base_directory(path)
 	update_files(path, base)
 	print('Done.')
 
 def command_template(name='', base=get_base_directory()):
+	""" Command: template """
 	# (List files and choose one)
 	if name == '':
 		print('List of files:')
-		for t in list_templates(base):
-			print('  ' + t)
+		for template in list_templates(base):
+			print('  ' + template)
 		print('')
 		try:
 			name = prompt("Enter a template name:")
@@ -271,8 +278,10 @@ def command_template(name='', base=get_base_directory()):
 	update_template(name, cwd, base)
 	print('Done.')
 
-if __name__ == '__main__':
+def main():
+	""" The main program """
 	def usage():
+		""" Usage """
 		script_name = os.path.basename(sys.argv[0])
 		print('Usage: %s init [PATH] [BASE]' % script_name)
 		print('       %s update [BASE]' % script_name)
@@ -291,11 +300,11 @@ if __name__ == '__main__':
 		command = locals()['command_' + command]
 		try:
 			command(*sys.argv[2:])
-		except TypeError as e:
-			print(e)
+		except TypeError as ex:
+			print(ex)
 			sys.exit(1)
-		except AbortException as e:
-			print('> ' + str(e))
+		except AbortException as ex:
+			print('> ' + str(ex))
 			sys.exit(1)
 		except KeyboardInterrupt:
 			print(' > Interrupted')
@@ -307,3 +316,6 @@ if __name__ == '__main__':
 		print('')
 		usage()
 		sys.exit(1)
+
+if __name__ == '__main__':
+	main()

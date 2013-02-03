@@ -36,7 +36,7 @@ else
 	JAVADOC=$(JAVA_HOME)/bin/javadoc
 endif
 
-INTERN_MAKE_DEPGEN=$(SCRIPT_DIR)/doc-depgen.py
+INTERN_MAKE_DEPGEN=$(SCRIPT_DIR)/doc_depgen.py
 INTERN_MAKE_FILES=Makefile.files
 INTERN_MAKE_DEPS=Makefile.d
 INTERN_MAKE_GEN=Makefile.genlist
