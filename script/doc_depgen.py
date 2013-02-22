@@ -149,10 +149,10 @@ def find_md_dependencies(filename, dep):
 			# an example of reference: ![some text](url "optional description")
 			m = re.search(r'!\[[^]]+\]\(([^)]+)(?:\s["\'].*["\'])?\)', line)
 			if m is None: continue
-			ref = m.group(1)
-			if ref in dep: continue
-			dep.add(ref)
-			find_dependencies(ref, dep)
+			url = m.group(1)
+			if url in dep or url.find('://') >= 0: continue
+			dep.add(url)
+			find_dependencies(url, dep)
 
 # =========================================================
 
