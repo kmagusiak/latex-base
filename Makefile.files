@@ -19,7 +19,6 @@
 #LATEXMK=
 #PANDOC=pandoc
 #PANDOC_FLAGS=--smart
-#PANDOC_PDF_FLAGS=$(PANDOC_FLAGS) --toc --number-sections
 #PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 #PYTHON=python
 #UMLGRAPH_ARG=-private
