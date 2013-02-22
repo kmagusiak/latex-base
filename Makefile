@@ -15,7 +15,6 @@ GRAPHVIZ_DOT=dot
 LATEXMK=$(shell which latexmk 2> /dev/null)
 PANDOC=pandoc
 PANDOC_FLAGS=--smart
-PANDOC_PDF_FLAGS=$(PANDOC_FLAGS)
 PLANTUML_JAR=$(SCRIPT_DIR)/plantuml.jar
 PYTHON=python
 RM=rm -f
@@ -112,20 +111,20 @@ define log-sort
 		|| true
 	mv "$(INTERN_MAKE_GEN).sort" $(INTERN_MAKE_GEN)
 endef
-# Streams markdown concatenated document
-define markdown-stream # $1: root file
-	$(PYTHON) "$(SCRIPT_DIR)/markdown_stream.py" "$(1)"
-endef
-# Builds a pdf using pandoc
-define pandoc-pdf # $1: output file; $2: pandoc args
-	$(PANDOC) $(PANDOC_PDF_FLAGS) -o "$(1)" $(2)
+# Builds a pdf file using pandoc
+define markdown-stream-pdf # $1: root file; $2: output file
+	$(PYTHON) "$(SCRIPT_DIR)/markdown_stream.py" \
+		--exec $(PANDOC) $(PANDOC_FLAGS) -o "$(2)" -- \
+		"$(1)"
 endef
 # Builds a tex file using pandoc
 # Contains:
 #  fix for enumitem package
 #  uses listings package
-define pandoc-tex # $1: output file; $2: pandoc args
-	$(PANDOC) $(PANDOC_FLAGS) --listings -t latex $(2) \
+define markdown-stream-tex # $1: root file; $2: output file
+	$(PYTHON) "$(SCRIPT_DIR)/markdown_stream.py" \
+		--exec $(PANDOC) $(PANDOC_FLAGS) --listings -t latex -- \
+		"$(1)" \
 		| sed -r 's/(begin\{enumerate})\[(.)?1(.)?]/\1[label=\2\\arabic*\3]/' \
 		| sed -r 's/(begin\{enumerate})\[(.)?a(.)?]/\1[label=\2\\alph*\3]/' \
 		| sed -r 's/(begin\{enumerate})\[(.)?A(.)?]/\1[label=\2\\Alph*\3]/' \
@@ -133,7 +132,7 @@ define pandoc-tex # $1: output file; $2: pandoc args
 		| sed -r 's/(begin\{enumerate})\[(.)?I(.)?]/\1[label=\2\\Roman*\3]/' \
 		| sed -r 's/(begin\{enumerate})\[.{1,3}]/\1/' \
 		| sed -r 's/(begin\{lstlisting})\[language=(\w+)]/\1\[style=\2]/' \
-		> "$(1)"
+		> "$(2)"
 endef
 # Compiles a tex file into a pdf file
 define pdf-latex # $1: tex file
@@ -336,12 +335,12 @@ documents-distclean: documents-clean
 
 %.pdf: %.md
 	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
-	$(call markdown-stream,$<) | $(call pandoc-pdf,$@,)
+	$(call markdown-stream-pdf,$<,$@)
 	$(call log-generated,$@)
 
 %.tex: %.md
 	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
-	$(call markdown-stream,$<) | $(call pandoc-tex,$@,)
+	$(call markdown-stream-tex,$<,$@)
 	$(call log-generated,$@)
 
 %.md: %.markdown
