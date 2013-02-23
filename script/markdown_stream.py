@@ -71,11 +71,12 @@ def parse_header(filename):
 	- author (str)
 	- date (str)
 	- title (str)
-	- args ([str])
+	- notes ([str]): other notes
+	- $ ([str]): when a line in notes begins with "$:"
 	Returns None when there is no header.
 	"""
 	header = {prop: '' for prop in HEADER_LINES}
-	header['args'] = []
+	header['notes'] = []
 	order = [None] + HEADER_LINES
 	with open(filename, 'r') as f:
 		i = 0
@@ -87,11 +88,16 @@ def parse_header(filename):
 					return None
 				break
 			line = line[1:].strip()
-			key = i
 			if i < len(order):
 				header[order[i]] = line
 			else:
-				header['args'].append(line)
+				m = re.match(r'^(\w+):(.*)$', line)
+				if m is None:
+					header['notes'].append(line)
+				else:
+					line = m.group(2).split(' ')
+					if line[0] == '': line = line[1:]
+					header[m.group(1)] = line
 	return header
 
 def execute(input_files, out=sys.stdout, err=sys.stderr, header=True):
@@ -134,12 +140,7 @@ def main(out=sys.stdout, err=sys.stderr):
 		err.write("No input files\n")
 		return
 	# Parse the header
-	header = parse_header(input_files[0])
-	if header is not None:
-		for h in HEADER_LINES:
-			err.write("%s: %s\n" % (h, header[h]))
-		if prog is not None:
-			prog = prog + header['args']
+	__main_parse_header(input_files[0], err=err, prog=prog)
 	# Execute
 	wait = None
 	if prog is not None:
@@ -155,6 +156,20 @@ def main(out=sys.stdout, err=sys.stderr):
 		err.write("Document transformed\n")
 		out.close()
 		wait.wait()
+
+def __main_parse_header(filename, err, prog):
+	"""Parses the header of a file before execution"""
+	header = parse_header(filename)
+	if header is None:
+		return
+	for entry in HEADER_LINES:
+		err.write("%8s: %s\n" % (entry, header[entry]))
+	for entry in header['notes']:
+		err.write("  %s\n" % entry)
+	if prog is not None:
+		entry = os.path.basename(prog[0])
+		if entry in header:
+			prog.extend(header[entry])
 
 RECURSION_FUNCTIONS = {e: copy_markdown for e in MD_EXT}
 
