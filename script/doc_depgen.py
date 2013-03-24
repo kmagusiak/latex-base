@@ -10,7 +10,7 @@ import os.path
 import re
 import sys
 
-GEN_FROM = 'Makefile.files'
+GEN_FROM = ['Makefile.files']
 IMG_ROOT_DIR = 'img'
 IMG_EXT_NORMAL = ['eps', 'jpg', 'pdf', 'png']
 IMG_EXT_DEF = 'pdf'
@@ -216,7 +216,9 @@ def main():
 		['.' + ext for ext in ['bib', 'cls', 'tex'] + MD_EXT])
 	alldeps = set(i for i in alldeps if accept(i))
 	out.write("# Dependencies of this file\nMakefile.d:")
-	out.write(" " + GEN_FROM)
+	for path in GEN_FROM:
+		if os.path.exists(path):
+			out.write(" " + path)
 	write_deps(out, alldeps, "\n\n")
 	out.write("# EOF\n")
 
