@@ -57,7 +57,7 @@ def copy_markdown(out, filename,
 						out.write(line[m.end():])
 						continue
 					else:
-						err.write("Included file (skipped): %s\n" % ref)
+						err.write("Included file (as is): %s\n" % ref)
 				out.write(line)
 	except IOError as ex:
 		err.write("IOError when reading: %s\n" % filename)
