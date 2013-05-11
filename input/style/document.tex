@@ -18,3 +18,39 @@
 %% Hypentenation control
 %\hyphenpenalty=5000
 %\tolerance=1000
+
+%% Default \maketitle
+\makeatletter
+\renewcommand{\@maketitle}{
+	\newpage
+	\null
+	\vskip 2em
+	\begin{center}
+	\ifthenelse{\isundefined{\docorganization}}{}{%
+	\ifthenelse{\equal{\docorganization}{}}{}{%
+	\normalsize
+		\ifthenelse{\isundefined{\doclogo}}{}{%
+		\ifthenelse{\equal{\doclogo}{}}{}{%
+		\includeimagebase[height=1.5em,width=3cm]{\doclogo}
+		}}
+		\docorganization\par
+		\bigskip
+	}}
+	{ \Huge\bfseries\scshape
+		\@title\par
+	}
+	\medskip
+	{ \normalsize
+		\begin{tabular}{c} \@author \end{tabular}
+		\par
+	}
+	\medskip
+	{ \normalsize
+		\@date\par
+	}
+	\end{center}
+	\par
+	\vskip 2em
+}
+\makeatother
+
