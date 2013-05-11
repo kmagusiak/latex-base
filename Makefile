@@ -121,9 +121,9 @@ endef
 # Contains:
 #  fix for enumitem package
 #  uses listings package
-define markdown-stream-tex # $1: root file; $2: output file
+define markdown-stream-tex # $1: root file; $2: output file; $3: latex/beamer
 	$(PYTHON) "$(SCRIPT_DIR)/markdown_stream.py" \
-		--exec $(PANDOC) $(PANDOC_FLAGS) --listings -t latex -- \
+		--exec $(PANDOC) $(PANDOC_FLAGS) --listings -t "$(firstword $(3) latex)" -- \
 		"$(1)" \
 		| sed -r 's/(begin\{enumerate})\[(.)?1(.)?]/\1[label=\2\\arabic*\3]/' \
 		| sed -r 's/(begin\{enumerate})\[(.)?a(.)?]/\1[label=\2\\alph*\3]/' \
@@ -311,12 +311,15 @@ endif
 %.tex.clean:
 ifneq (x,x$(LATEXMK))
 	$(call pdf-latexmk-clean,$*.tex)
+	$(RM) $(foreach e,\
+		vrb \
+		,"$*.$(e)") # Other files
 else
 	$(RM) $(foreach e,\
 		acn acr alg aux bbl bcf blg fax glg glo gls idx ilg ind ist \
 		lof log loh loi lot nav out snm tns toc vrb \
 		run.xml *.gnuplot *.table \
-		,$*.$(e)) $*-blx.bib
+		,"$*.$(e)") "$*-blx.bib"
 endif
 
 latex-clean: $(DOC:.tex=.tex.clean)
@@ -341,6 +344,11 @@ documents-distclean: documents-clean
 %.tex: %.md
 	@$(MSG_BEGIN) Generating $@ from markdown $(MSG_END)
 	$(call markdown-stream-tex,$<,$@)
+	$(call log-generated,$@)
+
+%.tex: %.md_beamer
+	@$(MSG_BEGIN) Generating $@ from markdown beamer $(MSG_END)
+	$(call markdown-stream-tex,$<,$@,beamer)
 	$(call log-generated,$@)
 
 %.md: %.markdown
@@ -474,5 +482,5 @@ FORCE: ; @true
 	latex-clean list
 .SUFFIXES: .aux .bib .bbl .dia .dot \
 	.eps .glo .glg .idx .ind .java \
-	.md .markdown .mkdn .mdown \
+	.md .markdown .mkdn .mdown .md_beamer \
 	.pdf .plant .pic .png .rst .svg .tex .txt
